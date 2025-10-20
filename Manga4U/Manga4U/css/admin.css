@@ -1,0 +1,101 @@
+/* Toolbar */
+.adminToolbar{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:12px 0 16px }
+.admSearch{
+  display:flex; align-items:center; gap:8px;
+  padding:8px 10px; border:1px solid rgba(255,255,255,.06); border-radius:12px;
+  background:#141419; min-width:260px;
+}
+.admSearch svg{ width:18px; height:18px; color:#cfc9f5 }
+.admSearch input{ background:transparent; border:0; outline:none; color:var(--text); width:180px }
+.admFilters select{
+  appearance:none; background:#141419; color:var(--text); border:1px solid rgba(255,255,255,.06);
+  padding:8px 10px; border-radius:10px; margin-right:8px;
+}
+
+/* Users list */
+.usersCard{
+  background: linear-gradient(180deg, #1a1a22, #121219);
+  border: var(--border); border-radius: 16px;
+  box-shadow: 0 0 25px rgba(139,109,216,0.22);
+  padding: 10px;
+}
+.usersHead, .userRow{
+  display:grid;
+  grid-template-columns: 1.2fr 1.6fr .9fr 1fr 1fr;
+  gap:10px; align-items:center;
+}
+.usersHead{
+  padding:10px; border-bottom:1px solid rgba(255,255,255,.06); color:#cbc7dd; font-weight:600;
+}
+.userRow{ padding:10px; border-radius:12px }
+.userRow:nth-child(odd){ background: rgba(255,255,255,.02) }
+
+.col--nick{ display:flex; gap:10px; align-items:center }
+.userAvatar{ width:36px; height:36px; border-radius:10px; object-fit:cover; background:#0f0f14; border:1px solid rgba(255,255,255,.06) }
+.userNick{ font-weight:700 }
+.userEmail{ color:var(--muted); font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+
+.badge{
+  display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; font-weight:600; font-size:13px;
+  border:1px solid rgba(255,255,255,.06); background:#0f0f14;
+}
+.badge--role-admin{ color:#ffdca8; border-color:rgba(255,220,168,.25) }
+.badge--status-active{ color:#a8f3c3; border-color:rgba(168,243,195,.25) }
+.badge--status-muted{ color:#ffbf6e; border-color:rgba(255,191,110,.25) }
+.badge--status-banned{ color:#ff8a9a; border-color:rgba(255,138,154,.28) }
+
+.actionBar{ display:flex; gap:8px; flex-wrap:wrap }
+.btn, .ghostBtn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:8px 12px; border-radius:12px; cursor:pointer; font-weight:600;
+}
+.btn{ border:0 }
+.btn--primary{ background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#0f0f14 }
+.ghostBtn{ border:1px solid rgba(255,255,255,.08); background:#121019; color:var(--text) }
+.ghostBtn:hover{ border-color:rgba(139,109,216,.45) }
+
+/* Pager */
+.pager{ display:flex; gap:8px; justify-content:center; padding:12px 6px 4px }
+.pager button{ padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.08); background:#141419; color:var(--text) }
+.pager button[disabled]{ opacity:.5; cursor:not-allowed }
+
+/* Access warning */
+.adminAlert{ background:#221a28; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:12px; margin-top:10px; color:#ffb062 }
+
+/* Modal */
+.modal{ position:fixed; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.55); z-index:20; pointer-events:auto }
+.modal[hidden]{ display:none }
+.modal__card{
+  width:min(460px, calc(100% - 32px));
+  background: linear-gradient(180deg, #1b1722, #15121b);
+  border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:16px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45)
+}
+.modal__title{ margin:0 0 6px }
+.modal__text{ margin:0 0 12px; color:#d8d5e6 }
+.modal__actions{ display:flex; gap:10px; justify-content:flex-end }
+
+/* Toasts */
+.toasts{ position:fixed; right:16px; bottom:16px; display:grid; gap:8px; z-index:30 }
+.toast{
+  background:#17141d; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; color:#e9e7ef;
+  box-shadow:0 10px 24px rgba(0,0,0,.35)
+}
+.toast--ok{ border-color:rgba(94,227,138,.35) }
+.toast--err{ border-color:rgba(255,91,110,.35) }
+
+/* Responsive */
+@media (max-width: 960px){
+  .usersHead, .userRow{ grid-template-columns: 1.4fr 1.6fr .9fr 1fr }
+  .col--actions{ display:none }
+}
+@media (max-width: 640px){
+  .usersHead{ display:none }
+  .userRow{
+    grid-template-columns: 1fr;
+    gap:6px;
+    background:linear-gradient(180deg, #1c1a22, #14131a);
+  }
+  .userEmail{ white-space:normal }
+  .actionBar{ justify-content:flex-start }
+}

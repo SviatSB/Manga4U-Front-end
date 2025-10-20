@@ -1,0 +1,178 @@
+/* ===== Manga4U — Profile page ===== */
+
+/* Карточка профілю */
+.profileCard{
+  position: relative;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 18px;
+  background: linear-gradient(180deg, #1a1a22, #121219);
+  border: var(--border);
+  border-radius: 16px;
+  box-shadow: 0 0 25px rgba(139,109,216,0.25);
+  padding: 18px;
+  animation: breatheGlow 5s ease-in-out infinite;
+}
+@keyframes breatheGlow{
+  0%,100%{ box-shadow: 0 0 15px rgba(139,109,216,.35), 0 0 40px rgba(255,100,255,.08); }
+  50%{ box-shadow: 0 0 25px rgba(255,150,255,.35), 0 0 70px rgba(139,109,216,.30); }
+}
+
+/* ----------- Аватар / ліва колонка ----------- */
+.profileCard__aside{
+  display: grid;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 10px;
+}
+.avatar{
+  width: 240px; height: 240px; border-radius: 14px; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.06);
+  background: #0f0f14;
+  box-shadow: inset 0 -12px 24px rgba(0,0,0,.25);
+}
+.avatar img{
+  width: 100%; height: 100%;
+  object-fit: cover;
+  image-rendering: auto;
+  border-radius: 14px;
+  display: block;
+}
+
+.fileBtn, .ghostBtn, .btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding: 10px 14px; border-radius: 12px; cursor:pointer; font-weight:600;
+  border: 1px solid rgba(255,255,255,.08);
+  background: #14111c; color: var(--text); text-decoration:none;
+  transition: all .2s ease;
+}
+.fileBtn:hover, .ghostBtn:hover{ border-color: rgba(139,109,216,.45); }
+.ghostBtn{ background:#0e0e12; color:var(--muted); }
+.ghostBtn:hover{ color:#fff; border-color: rgba(139,109,216,.45); }
+
+.btn{ border:0 }
+.btn--primary{
+  background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:#0f0f14;
+}
+.btn--primary:focus{ outline:none; box-shadow:0 0 0 3px rgba(139,109,216,.45) }
+
+.hint{ color:var(--muted); font-size:13px; margin:6px 2px 0 }
+.subttl{ margin:8px 0 8px; font-weight:800; font-size:16px; opacity:.95 }
+
+/* ----------- Права колонка / форма ----------- */
+.profileForm{ display:grid; gap:12px }
+.grid2{ display:grid; grid-template-columns: 1fr 1fr; gap:12px }
+.grid3{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px }
+
+.f{ display:block }
+.fl{ display:block; margin:0 0 6px; color:#cbc7dd; font-size:14px }
+.fi{
+  width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.06);
+  background:#141419; color:var(--text); outline:none;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+.fi:focus{ box-shadow:0 0 0 3px rgba(139,109,216,.45); border-color:transparent }
+
+.pw{ position:relative }
+/* --- Кнопка показу/приховування пароля 👁 --- */
+.pw__t {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.06);
+  background: #0c0c10;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.25s ease;
+}
+
+/* Іконка ока (SVG) */
+.pw__t svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: #8b6dd8;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 0.25s ease, transform 0.25s ease;
+}
+
+/* Hover */
+.pw__t:hover {
+  border-color: rgba(139,109,216,.45);
+  background: #16131f;
+}
+
+/* Активний стан (коли пароль відкрито) */
+.pw__t.active {
+  background: #1a1328;
+  border-color: rgba(255,150,255,.45);
+  box-shadow: 0 0 8px rgba(139,109,216,.35);
+}
+
+.pw__t.active svg {
+  stroke: #ff91ff;
+  transform: scale(1.05);
+}
+
+.fe{ min-height:18px; margin:6px 2px 0; color:#ff5b6e; font-size:13px }
+
+.actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:4px }
+.messages{ margin-top:10px }
+.messages .msg{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.06);
+  background:#141419;
+  font-size:14px;
+  margin-top:8px;
+  transition: box-shadow .3s ease;
+}
+.msg--ok{
+  border-color:rgba(94,227,138,.45);
+  box-shadow:0 0 12px rgba(94,227,138,.25);
+}
+.msg--err{
+  border-color:rgba(255,91,110,.45);
+  box-shadow:0 0 12px rgba(255,91,110,.25);
+}
+
+/* ----------- Preloader (опціонально) ----------- */
+.profileCard.loading::before{
+  content:"";
+  position:absolute; inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(2px);
+  z-index:5;
+}
+.profileCard.loading::after{
+  content:"";
+  position:absolute; top:50%; left:50%;
+  width:48px; height:48px;
+  border-radius:50%;
+  border:4px solid rgba(139,109,216,.35);
+  border-top-color:var(--accent);
+  animation:spin 0.9s linear infinite;
+  transform:translate(-50%,-50%);
+  z-index:6;
+}
+@keyframes spin{
+  to{ transform:translate(-50%,-50%) rotate(360deg); }
+}
+
+/* ----------- Adaptive ----------- */
+@media (max-width: 992px){
+  .profileCard{ grid-template-columns: 1fr; }
+  .profileCard__aside{ grid-template-columns: auto auto; grid-template-rows: auto; gap: 12px; align-items:start }
+  .avatar{ width: 190px; height: 190px }
+}
+@media (max-width: 640px){
+  .grid2{ grid-template-columns: 1fr }
+  .grid3{ grid-template-columns: 1fr }
+  .avatar{ width: 160px; height: 160px }
+}
