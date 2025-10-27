@@ -132,9 +132,9 @@
       const roleIsAdmin = isAdminRole(u);
       const roleIsOwner = isOwnerRole(u);
 
-      const avatarSrc = u.avatarUrl
-        ? `${API_BASE}/${u.avatarUrl.replace(/^\/+/, '')}`
-        : './avatar/default.png';
+      // Backend guarantees `u.avatarUrl` is a full absolute URL.
+      // Use it as-is (trim whitespace). No local fallback is used.
+      const avatarSrc = (typeof u.avatarUrl === 'string' && u.avatarUrl.trim()) ? u.avatarUrl.trim() : '';
 
       r.innerHTML = `
         <div class="col col--nick">
