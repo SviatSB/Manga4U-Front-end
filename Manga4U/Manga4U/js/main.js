@@ -1,5 +1,5 @@
 /* ========= Config ========= */
-window.API_BASE = window.API_BASE || 'https://localhost:7220';
+window.API_BASE = window.API_BASE || 'https://manga4u-164617ec4bac.herokuapp.com';
 
 /* ========= Token store ========= */
 const TokenStore = {

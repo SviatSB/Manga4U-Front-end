@@ -1,5 +1,5 @@
 /* ========= Config ========= */
-const API_BASE = 'https://localhost:7220';
+const API_BASE = 'https://manga4u-164617ec4bac.herokuapp.com';
 
 /* ========= TokenStore ========= */
 const TokenStore = {

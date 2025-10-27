@@ -2,7 +2,7 @@
 (() => {
   'use strict';
 
-  const API_BASE = 'https://localhost:7220';
+  const API_BASE = 'https://manga4u-164617ec4bac.herokuapp.com';
   const ENDPOINTS = {
     me: '/api/Account/me',
     changeNickname: '/api/Account/change-nickname',

@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  const API_BASE = "https://localhost:7220";
+  const API_BASE = "https://manga4u-164617ec4bac.herokuapp.com";
   const profileBtn = document.getElementById("profileBtn");
   const profileMenu = document.getElementById("profileMenu");
   const logoutBtn = document.getElementById("logoutBtn");

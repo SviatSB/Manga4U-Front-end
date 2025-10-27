@@ -1,7 +1,7 @@
 // ===== Manga4U api.client.js (v3.1 — з підтримкою login і токена) =====
 
 // 🌍 Базова адреса бекенду
-window.API_BASE = window.API_BASE || 'https://localhost:7220';
+window.API_BASE = window.API_BASE || 'https://manga4u-164617ec4bac.herokuapp.com';
 
 // --------------------------------------------------
 // 🔐 TokenStore — єдиний механізм зберігання JWT
