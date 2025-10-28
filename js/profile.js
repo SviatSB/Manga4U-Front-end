@@ -2,7 +2,10 @@
 (() => {
   'use strict';
 
-  const API_BASE = 'https://manga4u-164617ec4bac.herokuapp.com';
+  const API_BASE = import.meta.env.VITE_API_BASE;
+  if (!API_BASE) {
+    throw new Error('VITE_API_BASE is not set. Define it in .env.production/.env.development before building.');
+  }
   const ENDPOINTS = {
     me: '/api/Account/me',
     changeNickname: '/api/Account/change-nickname',
@@ -10,7 +13,7 @@
     changeAvatar: '/api/Account/change-avatar',
     resetAvatar: '/api/Account/reset-avatar',
     setLanguage: '/api/Account/language',
-    setAbout: '/api/Account/about'
+    setAbout: '/api/Account/about',
   };
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -27,15 +30,12 @@
   }
 
   async function api(path, options = {}) {
-    const token =
-      localStorage.getItem('m4u_token') ||
-      sessionStorage.getItem('m4u_token');
+    const token = localStorage.getItem('m4u_token') || sessionStorage.getItem('m4u_token');
     if (!token) throw new Error('No token found');
     const url = `${API_BASE}${path}`;
     const headers = new Headers(options.headers || {});
     headers.set('Authorization', `Bearer ${token}`);
-    if (!(options.body instanceof FormData))
-      headers.set('Content-Type', 'application/json');
+    if (!(options.body instanceof FormData)) headers.set('Content-Type', 'application/json');
 
     const res = await fetch(url, { ...options, headers });
     const text = await res.text();
@@ -57,7 +57,7 @@
   async function initProfile() {
     const form = $('#profileForm');
     const nick = $('#nick');
-    const email = $('#email');     // ✅ додано
+    const email = $('#email'); // ✅ додано
     const passOld = $('#passOld');
     const passNew = $('#passNew');
     const passNew2 = $('#passNew2');
@@ -161,7 +161,7 @@
         try {
           await api(ENDPOINTS.changeNickname, {
             method: 'PATCH',
-            body: JSON.stringify(newNick)
+            body: JSON.stringify(newNick),
           });
           showMsg('Нікнейм змінено ✅');
           originalNick = newNick;
@@ -176,7 +176,7 @@
         try {
           await api(ENDPOINTS.setLanguage, {
             method: 'PATCH',
-            body: JSON.stringify(newLang)
+            body: JSON.stringify(newLang),
           });
           showMsg('Мову інтерфейсу змінено ✅');
           originalLang = newLang;
@@ -191,7 +191,7 @@
         try {
           await api(ENDPOINTS.setAbout, {
             method: 'PATCH',
-            body: JSON.stringify(newBio)
+            body: JSON.stringify(newBio),
           });
           showMsg('Інформацію “про себе” оновлено ✅');
           originalBio = newBio;
@@ -202,21 +202,18 @@
       }
 
       // --- зміна паролю ---
-      const wantsChangePassword =
-        oldPwd.length > 0 && newPwd.length > 0 && newPwd2.length > 0;
+      const wantsChangePassword = oldPwd.length > 0 && newPwd.length > 0 && newPwd2.length > 0;
       if (wantsChangePassword) {
         try {
-          if (newPwd !== newPwd2)
-            throw new Error('Паролі не співпадають');
-          if (newPwd.length < 8)
-            throw new Error('Мінімум 8 символів');
+          if (newPwd !== newPwd2) throw new Error('Паролі не співпадають');
+          if (newPwd.length < 8) throw new Error('Мінімум 8 символів');
 
           await api(ENDPOINTS.changePassword, {
             method: 'POST',
             body: JSON.stringify({
               OldPassword: oldPwd,
-              NewPassword: newPwd
-            })
+              NewPassword: newPwd,
+            }),
           });
           showMsg('Пароль змінено ✅');
           passOld.value = newPwd;

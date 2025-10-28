@@ -1,13 +1,18 @@
 // ===== admin.app.server.js (v5.0 — логіка mute/ban синхронізована з .NET API) =====
 (function (w, d) {
   document.addEventListener('DOMContentLoaded', () => {
-    const qInput    = d.querySelector('#q');
-    const roleSel   = d.querySelector('#roleSel');
+    // Build-time API base (Vite). VITE_API_BASE must be provided.
+    const API_BASE = import.meta.env.VITE_API_BASE;
+    if (!API_BASE) {
+      throw new Error('VITE_API_BASE is not set. Define it in .env.production/.env.development before building.');
+    }
+    const qInput = d.querySelector('#q');
+    const roleSel = d.querySelector('#roleSel');
     const statusSel = d.querySelector('#statusSel');
-    const bodyEl    = d.querySelector('#usersBody');
-    const pagerEl   = d.querySelector('#pager');
+    const bodyEl = d.querySelector('#usersBody');
+    const pagerEl = d.querySelector('#pager');
     const usersCard = d.querySelector('#usersCard');
-    const alertBox  = d.querySelector('#adminAlert');
+    const alertBox = d.querySelector('#adminAlert');
 
     const state = { page: 1, perPage: 10, q: '', role: '', status: '' };
     let me = null;
@@ -15,7 +20,7 @@
     let isAdmin = false;
     let allUsers = [];
 
-    init().catch(err => {
+    init().catch((err) => {
       console.error(err);
       showMsg(err.message || 'Помилка ініціалізації', 'err');
     });
@@ -45,9 +50,24 @@
       alertBox.hidden = true;
       usersCard.hidden = false;
 
-      qInput?.addEventListener('input', debounce(() => { state.q = qInput.value.trim(); state.page=1; render(); }, 250));
-      roleSel?.addEventListener('change', () => { state.role = roleSel.value; state.page=1; render(); });
-      statusSel?.addEventListener('change', () => { state.status = statusSel.value; state.page=1; render(); });
+      qInput?.addEventListener(
+        'input',
+        debounce(() => {
+          state.q = qInput.value.trim();
+          state.page = 1;
+          render();
+        }, 250)
+      );
+      roleSel?.addEventListener('change', () => {
+        state.role = roleSel.value;
+        state.page = 1;
+        render();
+      });
+      statusSel?.addEventListener('change', () => {
+        state.status = statusSel.value;
+        state.page = 1;
+        render();
+      });
 
       await render();
     }
@@ -64,7 +84,7 @@
       }
       if (state.role) params.append('roles', state.role);
 
-      const data = await apiFetch(`/api/Admin/users?${params.toString()}`, { method:'GET' });
+      const data = await apiFetch(`/api/Admin/users?${params.toString()}`, { method: 'GET' });
       const items = data?.items || [];
       const total = data?.total ?? items.length;
       allUsers = items;
@@ -74,15 +94,25 @@
     async function render() {
       try {
         const { items, total } = await fetchUsers();
-        const filtered = state.status ? items.filter(u => statusOf(u) === state.status) : items;
+        const filtered = state.status ? items.filter((u) => statusOf(u) === state.status) : items;
         bodyEl.innerHTML = '';
-        filtered.forEach(u => bodyEl.appendChild(row(u)));
+        filtered.forEach((u) => bodyEl.appendChild(row(u)));
         const pages = Math.max(1, Math.ceil(total / state.perPage));
         pagerEl.innerHTML = '';
         pagerEl.append(
-          pageBtn('«', state.page <= 1, () => { if (state.page>1){ state.page--; render(); } }),
+          pageBtn('«', state.page <= 1, () => {
+            if (state.page > 1) {
+              state.page--;
+              render();
+            }
+          }),
           pageInfo(`${state.page}/${pages}`),
-          pageBtn('»', state.page >= pages, () => { if (state.page<pages){ state.page++; render(); } })
+          pageBtn('»', state.page >= pages, () => {
+            if (state.page < pages) {
+              state.page++;
+              render();
+            }
+          })
         );
       } catch (e) {
         console.error(e);
@@ -109,19 +139,19 @@
 
     function statusOf(u) {
       const banned = !!(u.isBanned ?? u.banned ?? u.status === 'banned');
-      const muted  = !!(u.isMuted  ?? u.muted  ?? u.status === 'muted');
+      const muted = !!(u.isMuted ?? u.muted ?? u.status === 'muted');
       if (banned) return 'banned';
-      if (muted)  return 'muted';
+      if (muted) return 'muted';
       return 'active';
     }
 
     function isAdminRole(u) {
-      const roles = (u.roles || []).map(r => String(r).toLowerCase());
+      const roles = (u.roles || []).map((r) => String(r).toLowerCase());
       return roles.includes('admin');
     }
 
     function isOwnerRole(u) {
-      const roles = (u.roles || []).map(r => String(r).toLowerCase());
+      const roles = (u.roles || []).map((r) => String(r).toLowerCase());
       return roles.includes('owner');
     }
 
@@ -134,7 +164,8 @@
 
       // Backend guarantees `u.avatarUrl` is a full absolute URL.
       // Use it as-is (trim whitespace). No local fallback is used.
-      const avatarSrc = (typeof u.avatarUrl === 'string' && u.avatarUrl.trim()) ? u.avatarUrl.trim() : '';
+      const avatarSrc =
+        typeof u.avatarUrl === 'string' && u.avatarUrl.trim() ? u.avatarUrl.trim() : '';
 
       r.innerHTML = `
         <div class="col col--nick">
@@ -145,22 +176,38 @@
           </div>
         </div>
         <div class="col col--email">${esc(u.email || u.login)}</div>
-        <div class="col col--role"><span class="badge ${roleIsOwner?'badge--role-owner':roleIsAdmin?'badge--role-admin':''}">
-          ${roleIsOwner?'Власник':roleIsAdmin?'Адмін':'Користувач'}</span></div>
-        <div class="col col--status"><span class="badge ${statusClass(st)}">${statusText(st)}</span></div>
+        <div class="col col--role"><span class="badge ${
+          roleIsOwner ? 'badge--role-owner' : roleIsAdmin ? 'badge--role-admin' : ''
+        }">
+          ${roleIsOwner ? 'Власник' : roleIsAdmin ? 'Адмін' : 'Користувач'}</span></div>
+        <div class="col col--status"><span class="badge ${statusClass(st)}">${statusText(
+        st
+      )}</span></div>
         <div class="col col--actions">
           <div class="actionBar">
-            ${isOwner ? (roleIsAdmin && !roleIsOwner
-              ? `<button class="ghostBtn act" data-act="demote" data-id="${u.id}">Зняти адміна</button>`
-              : (!roleIsOwner ? `<button class="btn btn--primary act" data-act="promote" data-id="${u.id}">Видати адміна</button>` : '')) : ''}
+            ${
+              isOwner
+                ? roleIsAdmin && !roleIsOwner
+                  ? `<button class="ghostBtn act" data-act="demote" data-id="${u.id}">Зняти адміна</button>`
+                  : !roleIsOwner
+                  ? `<button class="btn btn--primary act" data-act="promote" data-id="${u.id}">Видати адміна</button>`
+                  : ''
+                : ''
+            }
 
-            ${(st !== 'banned')
-              ? `<button class="ghostBtn act" data-act="${st==='muted'?'unmute':'mute'}" data-id="${u.id}">${st==='muted'?"Зняти м'ют":"М'ют"}</button>`
-              : ''}
+            ${
+              st !== 'banned'
+                ? `<button class="ghostBtn act" data-act="${
+                    st === 'muted' ? 'unmute' : 'mute'
+                  }" data-id="${u.id}">${st === 'muted' ? "Зняти м'ют" : "М'ют"}</button>`
+                : ''
+            }
 
-            ${(st==='banned')
-              ? `<button class="ghostBtn act" data-act="unban" data-id="${u.id}">Розбан</button>`
-              : `<button class="ghostBtn act" data-act="ban" data-id="${u.id}">Бан</button>`}
+            ${
+              st === 'banned'
+                ? `<button class="ghostBtn act" data-act="unban" data-id="${u.id}">Розбан</button>`
+                : `<button class="ghostBtn act" data-act="ban" data-id="${u.id}">Бан</button>`
+            }
           </div>
         </div>`;
       r.addEventListener('click', onRowClick);
@@ -176,7 +223,7 @@
     async function handleAction(id, action) {
       try {
         const token = localStorage.getItem('m4u_token') || sessionStorage.getItem('m4u_token');
-        const u = allUsers.find(x => x.id === id);
+        const u = allUsers.find((x) => x.id === id);
         if (!u) return;
 
         const currentStatus = statusOf(u);
@@ -196,7 +243,7 @@
 
         const res = await fetch(`${API_BASE}/api/Admin/user/${id}/${action}`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
 
         if (!res.ok) {
@@ -234,11 +281,12 @@
       }
     }
 
-
-
     function updateRowUI(id, newStatus) {
       const rowEl = bodyEl.querySelector(`[data-id="${id}"]`)?.closest('.userRow');
-      if (!rowEl) { render(); return; }
+      if (!rowEl) {
+        render();
+        return;
+      }
 
       const statusEl = rowEl.querySelector('.col--status span');
       if (statusEl) {
@@ -250,24 +298,60 @@
       if (!actionBar) return;
 
       // Перемальовуємо кнопки, щоб після unban знову з'явився "М'ют"
-      const u = allUsers.find(x => x.id === id);
+      const u = allUsers.find((x) => x.id === id);
       actionBar.innerHTML = `
-        ${(newStatus !== 'banned')
-          ? `<button class="ghostBtn act" data-act="${newStatus==='muted'?'unmute':'mute'}" data-id="${id}">${newStatus==='muted'?"Зняти м'ют":"М'ют"}</button>`
-          : ''}
+        ${
+          newStatus !== 'banned'
+            ? `<button class="ghostBtn act" data-act="${
+                newStatus === 'muted' ? 'unmute' : 'mute'
+              }" data-id="${id}">${newStatus === 'muted' ? "Зняти м'ют" : "М'ют"}</button>`
+            : ''
+        }
 
-        ${(newStatus==='banned')
-          ? `<button class="ghostBtn act" data-act="unban" data-id="${id}">Розбан</button>`
-          : `<button class="ghostBtn act" data-act="ban" data-id="${id}">Бан</button>`}
+        ${
+          newStatus === 'banned'
+            ? `<button class="ghostBtn act" data-act="unban" data-id="${id}">Розбан</button>`
+            : `<button class="ghostBtn act" data-act="ban" data-id="${id}">Бан</button>`
+        }
       `;
     }
 
     // Helpers
-    function pageBtn(label, disabled, onClick){ const b=d.createElement('button'); b.textContent=label; b.disabled=!!disabled; b.addEventListener('click',onClick); return b; }
-    function pageInfo(text){ const s=d.createElement('span'); s.style.padding='8px 12px'; s.textContent=text; return s; }
-    function statusText(s){ return s==='active'?'Активний': s==='muted'?'Замучений':'Забанений'; }
-    function statusClass(s){ return s==='active'?'badge--status-active': s==='muted'?'badge--status-muted':'badge--status-banned'; }
-    function esc(str){ return String(str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-    function debounce(fn,wait){ let t=null; return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),wait);} }
+    function pageBtn(label, disabled, onClick) {
+      const b = d.createElement('button');
+      b.textContent = label;
+      b.disabled = !!disabled;
+      b.addEventListener('click', onClick);
+      return b;
+    }
+    function pageInfo(text) {
+      const s = d.createElement('span');
+      s.style.padding = '8px 12px';
+      s.textContent = text;
+      return s;
+    }
+    function statusText(s) {
+      return s === 'active' ? 'Активний' : s === 'muted' ? 'Замучений' : 'Забанений';
+    }
+    function statusClass(s) {
+      return s === 'active'
+        ? 'badge--status-active'
+        : s === 'muted'
+        ? 'badge--status-muted'
+        : 'badge--status-banned';
+    }
+    function esc(str) {
+      return String(str || '').replace(
+        /[&<>"']/g,
+        (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m])
+      );
+    }
+    function debounce(fn, wait) {
+      let t = null;
+      return (...a) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...a), wait);
+      };
+    }
   });
 })(window, document);

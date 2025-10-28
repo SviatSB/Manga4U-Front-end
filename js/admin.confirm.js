@@ -18,7 +18,9 @@
     el.className = 'toast ' + (type === 'err' ? 'toast--err' : 'toast--ok');
     el.textContent = msg;
     toasts.appendChild(el);
-    setTimeout(function () { el.remove(); }, 2600);
+    setTimeout(function () {
+      el.remove();
+    }, 2600);
   }
 
   function confirmDo(message) {
@@ -29,11 +31,23 @@
       textEl.textContent = message;
       modal.hidden = false;
 
-      function onOk(e){ e.preventDefault(); cleanup(); resolve(true); }
-      function onCancel(e){ e && e.preventDefault(); cleanup(); resolve(false); }
-      function onKey(e){ if (e.key === 'Escape') onCancel(e); }
-      function onBackdrop(e){ if (e.target === modal) onCancel(e); }
-      function cleanup(){
+      function onOk(e) {
+        e.preventDefault();
+        cleanup();
+        resolve(true);
+      }
+      function onCancel(e) {
+        e && e.preventDefault();
+        cleanup();
+        resolve(false);
+      }
+      function onKey(e) {
+        if (e.key === 'Escape') onCancel(e);
+      }
+      function onBackdrop(e) {
+        if (e.target === modal) onCancel(e);
+      }
+      function cleanup() {
         modal.hidden = true;
         okBtn.removeEventListener('click', onOk);
         cancelBtn.removeEventListener('click', onCancel);
@@ -45,10 +59,12 @@
       cancelBtn.addEventListener('click', onCancel);
       window.addEventListener('keydown', onKey);
       modal.addEventListener('click', onBackdrop);
-      setTimeout(function(){ okBtn.focus(); }, 0);
+      setTimeout(function () {
+        okBtn.focus();
+      }, 0);
     });
   }
 
   w.Confirm = { ask: confirmDo };
-  w.Toast   = { ok: t => toast(t,'ok'), err: t => toast(t,'err') };
+  w.Toast = { ok: (t) => toast(t, 'ok'), err: (t) => toast(t, 'err') };
 })(window, document);

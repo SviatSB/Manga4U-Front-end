@@ -14,7 +14,7 @@ window.UsersStore = (function () {
     }
 
     const data = await apiFetch(`/api/Admin/users?${query.toString()}`, {
-      method: 'GET'
+      method: 'GET',
     });
 
     const items = data?.items || [];
@@ -25,11 +25,11 @@ window.UsersStore = (function () {
   // ✅ Отримати одного користувача (опціонально)
   async function getById(id) {
     const { items } = await fetchAll();
-    return items.find(u => u.id === id) || null;
+    return items.find((u) => u.id === id) || null;
   }
 
   return {
     fetchAll,
-    getById
+    getById,
   };
 })();

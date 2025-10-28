@@ -1,7 +1,10 @@
 // ===== Manga4U api.client.js (v3.1 — з підтримкою login і токена) =====
 
-// 🌍 Базова адреса бекенду
-window.API_BASE = window.API_BASE || 'https://manga4u-164617ec4bac.herokuapp.com';
+// 🌍 Базова адреса бекенду (build-time через Vite). VITE_API_BASE обязателен.
+const API_BASE = import.meta.env.VITE_API_BASE;
+if (!API_BASE) {
+  throw new Error('VITE_API_BASE is not set. Define it in .env.production/.env.development before building.');
+}
 
 // --------------------------------------------------
 // 🔐 TokenStore — єдиний механізм зберігання JWT
@@ -136,9 +139,7 @@ window.Auth = {
    * @param {string} role - назва ролі ("admin", "owner", "user")
    */
   hasRole(user, role) {
-    const roles = (user?.roles || user?.role || []).map((r) =>
-      String(r).toLowerCase()
-    );
+    const roles = (user?.roles || user?.role || []).map((r) => String(r).toLowerCase());
     return roles.includes(role.toLowerCase());
   },
 

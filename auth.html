@@ -1,108 +1,153 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="uk">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Manga4U — Вхід / Реєстрація</title>
-  <link rel="stylesheet" href="./css/auth.css" />
-</head>
-<body class="page">
-
-  <header class="header">
-    <div class="header__inner">
-      <a class="logo">
-        <span class="logo__badge">M4U</span>
-        <span class="logo__word">Manga4U</span>
-      </a>
-      <nav class="header__nav">
-        <a class="header__link" href="../Manga4U/index.html">Увійти як гість</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="auth">
-    <section class="auth__card">
-      <div class="auth__tabs">
-        <button id="tab-login-btn" class="auth__tab auth__tab--active">Вхід</button>
-        <button id="tab-register-btn" class="auth__tab">Реєстрація</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Manga4U — Вхід / Реєстрація</title>
+    <link rel="stylesheet" href="./css/auth.css" />
+  </head>
+  <body class="page">
+    <header class="header">
+      <div class="header__inner">
+        <a class="logo">
+          <span class="logo__badge">M4U</span>
+          <span class="logo__word">Manga4U</span>
+        </a>
+        <nav class="header__nav">
+          <a class="header__link" href="../Manga4U/index.html">Увійти як гість</a>
+        </nav>
       </div>
+    </header>
 
-      <!-- Вхід -->
-      <form class="form form--visible" id="form-login" novalidate>
-        <div class="form__group">
-          <label for="login-email" class="form__label">Логін</label>
-          <input type="text" id="login-email" name="login" class="form__input" placeholder="yourLogin" required>
-          <p class="form__error" data-for="login-email"></p>
+    <main class="auth">
+      <section class="auth__card">
+        <div class="auth__tabs">
+          <button id="tab-login-btn" class="auth__tab auth__tab--active">Вхід</button>
+          <button id="tab-register-btn" class="auth__tab">Реєстрація</button>
         </div>
 
-        <div class="form__group">
-          <label for="login-password" class="form__label">Пароль</label>
-          <div class="form__password">
-            <input type="password" id="login-password" name="password" class="form__input form__input--password" placeholder="••••••••" minlength="8" required>
-            <button type="button" class="form__togglePass" aria-label="Показати пароль"></button>
+        <!-- Вхід -->
+        <form class="form form--visible" id="form-login" novalidate>
+          <div class="form__group">
+            <label for="login-email" class="form__label">Логін</label>
+            <input
+              type="text"
+              id="login-email"
+              name="login"
+              class="form__input"
+              placeholder="yourLogin"
+              required
+            />
+            <p class="form__error" data-for="login-email"></p>
           </div>
-          <p class="form__error" data-for="login-password"></p>
-        </div>
 
-        <label class="form__check">
-          <input type="checkbox" name="remember"> <span>Запам’ятати мене</span>
-        </label>
-
-        <button type="submit" class="button button--primary">Увійти</button>
-        <p class="form__hint">Немає акаунта?
-          <button type="button" class="linkLike" data-switch="register">Створити</button>
-        </p>
-        <div class="form__messages" id="login-messages"></div>
-      </form>
-
-      <!-- Реєстрація -->
-      <form class="form" id="form-register" novalidate>
-        <div class="form__group">
-          <label for="reg-nickname" class="form__label">Нікнейм</label>
-          <input type="text" id="reg-nickname" name="nickname" class="form__input" placeholder="Напр., Alex" minlength="3" maxlength="16">
-          <p class="form__error" data-for="reg-nickname"></p>
-        </div>
-
-        <div class="form__group">
-          <label for="reg-login" class="form__label">Логін</label>
-          <input type="text" id="reg-login" name="login" class="form__input" placeholder="yourLogin" required>
-          <p class="form__error" data-for="reg-login"></p>
-        </div>
-
-        <div class="form__group">
-          <label for="reg-password" class="form__label">Пароль</label>
-          <div class="form__password">
-            <input type="password" id="reg-password" name="password" class="form__input form__input--password" minlength="8" required>
-            <button type="button" class="form__togglePass" aria-label="Показати пароль"></button>
+          <div class="form__group">
+            <label for="login-password" class="form__label">Пароль</label>
+            <div class="form__password">
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                class="form__input form__input--password"
+                placeholder="••••••••"
+                minlength="8"
+                required
+              />
+              <button type="button" class="form__togglePass" aria-label="Показати пароль"></button>
+            </div>
+            <p class="form__error" data-for="login-password"></p>
           </div>
-        </div>
 
-        <div class="form__group">
-          <label for="reg-password2" class="form__label">Підтвердження пароля</label>
-          <div class="form__password">
-            <input type="password" id="reg-password2" name="password2" class="form__input form__input--password" minlength="8" required>
-            <button type="button" class="form__togglePass" aria-label="Показати пароль"></button>
+          <label class="form__check">
+            <input type="checkbox" name="remember" /> <span>Запам’ятати мене</span>
+          </label>
+
+          <button type="submit" class="button button--primary">Увійти</button>
+          <p class="form__hint">
+            Немає акаунта?
+            <button type="button" class="linkLike" data-switch="register">Створити</button>
+          </p>
+          <div class="form__messages" id="login-messages"></div>
+        </form>
+
+        <!-- Реєстрація -->
+        <form class="form" id="form-register" novalidate>
+          <div class="form__group">
+            <label for="reg-nickname" class="form__label">Нікнейм</label>
+            <input
+              type="text"
+              id="reg-nickname"
+              name="nickname"
+              class="form__input"
+              placeholder="Напр., Alex"
+              minlength="3"
+              maxlength="16"
+            />
+            <p class="form__error" data-for="reg-nickname"></p>
           </div>
-        </div>
 
-        <label class="form__check form__check--mb">
-          <input type="checkbox" id="reg-terms" required>
-          <span>Погоджуюсь з правилами платформи</span>
-        </label>
+          <div class="form__group">
+            <label for="reg-login" class="form__label">Логін</label>
+            <input
+              type="text"
+              id="reg-login"
+              name="login"
+              class="form__input"
+              placeholder="yourLogin"
+              required
+            />
+            <p class="form__error" data-for="reg-login"></p>
+          </div>
 
-        <button type="submit" class="button button--primary">Зареєструватися</button>
-        <p class="form__hint">Вже маєш акаунт?
-          <button type="button" class="linkLike" data-switch="login">Увійти</button>
-        </p>
-        <div class="form__messages" id="register-messages"></div>
-      </form>
-    </section>
-  </main>
+          <div class="form__group">
+            <label for="reg-password" class="form__label">Пароль</label>
+            <div class="form__password">
+              <input
+                type="password"
+                id="reg-password"
+                name="password"
+                class="form__input form__input--password"
+                minlength="8"
+                required
+              />
+              <button type="button" class="form__togglePass" aria-label="Показати пароль"></button>
+            </div>
+          </div>
 
-  <footer class="footer">
-    <p class="footer__text">© 2025 Manga4U</p>
-  </footer>
+          <div class="form__group">
+            <label for="reg-password2" class="form__label">Підтвердження пароля</label>
+            <div class="form__password">
+              <input
+                type="password"
+                id="reg-password2"
+                name="password2"
+                class="form__input form__input--password"
+                minlength="8"
+                required
+              />
+              <button type="button" class="form__togglePass" aria-label="Показати пароль"></button>
+            </div>
+          </div>
 
-  <script src="./js/auth.js" defer></script>
-</body>
+          <label class="form__check form__check--mb">
+            <input type="checkbox" id="reg-terms" required />
+            <span>Погоджуюсь з правилами платформи</span>
+          </label>
+
+          <button type="submit" class="button button--primary">Зареєструватися</button>
+          <p class="form__hint">
+            Вже маєш акаунт?
+            <button type="button" class="linkLike" data-switch="login">Увійти</button>
+          </p>
+          <div class="form__messages" id="register-messages"></div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p class="footer__text">© 2025 Manga4U</p>
+    </footer>
+
+  <script type="module" src="/js/auth.js"></script>
+  </body>
 </html>
