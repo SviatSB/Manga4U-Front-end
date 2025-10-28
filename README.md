@@ -1,54 +1,49 @@
-# Manga4U Front-end — minimal Vite + ESLint + Prettier setup
+# Commands
 
-Что сделано:
+Below are the main commands you will use in this project.
 
-- Добавлен `package.json` с базовыми скриптами: `dev`, `build`, `preview`, `lint`, `format`.
-- Настроен `vite.config.js` для локальной разработки.
-- Добавлен `.eslintrc.cjs` и `.prettierrc`.
-- Добавлены `.env.development` и `.env.production` с примером `VITE_API_BASE`.
-- `js/auth.js` использует build-time переменную Vite `VITE_API_BASE` (см. ниже).
-
-Как использовать (локально):
-
-1. Установить зависимости:
+Install dependencies
 
 ```pwsh
 npm install
 ```
 
-2. Запустить dev сервер (Vite):
+Start development server (Vite)
 
 ```pwsh
 npm run dev
 ```
 
-3. Изменить базовый API URL во время разработки и при билде:
+Build for production
 
-- Рекомендуемый способ (build-time, стандарт для Vite): укажите `VITE_API_BASE` в `.env.development` или `.env.production`. В коде используется `import.meta.env.VITE_API_BASE`.
-	Обратите внимание: `VITE_API_BASE` теперь обязательна — сборка и рантайм будут выбрасывать ошибку, если переменная не задана.
-
-- Пример локального `.env.development`:
-
-```text
-VITE_API_BASE="http://localhost:7220"
+```pwsh
+npm run build
 ```
 
-При запуске `npm run dev` Vite подхватит `.env.development`. При `npm run build` будет использовано `.env.production`.
+Preview local production build
 
-Lint и форматирование:
+```pwsh
+npm run preview
+```
+
+Lint the codebase (ESLint)
 
 ```pwsh
 npm run lint
+```
+
+Format files (Prettier)
+
+```pwsh
 npm run format
 ```
 
-Дальше я могу:
+Environment
 
-- Подключить `eslint-plugin-html` для линта HTML-файлов (в package.json уже указан в devDeps),
-- Поэтапно перевести скрипты в ES Modules и использовать `import.meta.env` (чтобы брать `VITE_API_BASE` автоматически),
-- Добавить GitHub Actions для запуска линта/тестов.
+Set `VITE_API_BASE` in your `.env.development` (for dev) and `.env.production` (for build). Example:
 
-Скажите, хотите ли сразу, чтобы я:
+```
+VITE_API_BASE="http://localhost:7220"
+```
 
-1. Перевёл часть `js/` скриптов в ES Modules и использовал `import.meta.env.VITE_API_BASE` (это потребует правки HTML, чтобы подключать с `type="module"`).
-2. Добавил GitHub Actions для запуска линта и сборки при PR.
+That's it.
