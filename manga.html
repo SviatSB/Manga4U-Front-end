@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manga — details</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    body { padding:18px; font-family: system-ui,Segoe UI,Roboto,Arial; background:#fff; color:#111 }
+    .panel { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; margin-bottom:12px }
+    .btn { padding:8px 12px; border-radius:6px; border:1px solid #bbb; background:#fafafa; cursor:pointer; text-decoration:none; color:inherit }
+    .layout { display:grid; grid-template-columns: 220px 1fr; gap:18px }
+    .thumb { width:220px; height:330px; object-fit:cover; background:#f6f6f6; border:1px solid #eee; border-radius:6px }
+    h1 { margin:0 0 8px 0 }
+    .meta { color:#444; font-size:14px; margin-bottom:8px }
+    .tags { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 }
+    .tag { background:#f3f3f3; padding:6px 8px; border-radius:6px; font-size:13px }
+    pre.desc { background:#f6f6f6; padding:12px; border-radius:6px; white-space:pre-wrap }
+  </style>
+</head>
+<body>
+  <header class="panel" style="display:flex; align-items:center; gap:10px">
+    <nav aria-label="Main">
+      <a class="btn" href="/mangadex-test.html">Tester</a>
+      <a class="btn" href="/mangadex-search.html">Search</a>
+      <a class="btn" href="/mangadex-new.html">New</a>
+      <a class="btn" href="/mangadex-popular.html">Popular</a>
+    </nav>
+  </header>
+
+  <div id="content" class="panel">
+    <div id="status">Loading...</div>
+  </div>
+
+  <script type="module">
+    import './js/api.client.js';
+    import MangadexService from './js/mangadex.service.js';
+
+    function qs(name) { const m = location.search.match(new RegExp('[?&]'+name+'=([^&]+)')); return m ? decodeURIComponent(m[1]) : null; }
+
+    const id = qs('id');
+    const content = document.getElementById('content');
+    async function load() {
+      if (!id) { content.innerHTML = '<div style="color:#c00">No manga id provided in query (use ?id=...)</div>'; return; }
+      content.innerHTML = '<div id="status">Loading manga...</div>';
+      try {
+        // fetch manga details via proxy
+        const res = await MangadexService.callProxy(`/manga/${id}`);
+        // Mangadex returns object with data
+        const data = res?.data || res;
+        const attr = data?.attributes || {};
+        const title = (attr?.title && (attr.title.en || Object.values(attr.title||{})[0])) || '(No title)';
+        const alt = (attr?.altTitles && attr.altTitles.length) ? (attr.altTitles[0] && (attr.altTitles[0].en || Object.values(attr.altTitles[0]||{})[0])) : '';
+        const desc = (attr?.description && (attr.description.en || Object.values(attr.description||{})[0])) || '';
+        const statusText = attr?.status || '';
+        const year = attr?.year || '';
+
+        // find cover relationship
+        const relCover = (data.relationships || []).find(r => r.type === 'cover_art');
+        let coverUrl = '/css/placeholder.png';
+        if (relCover && relCover.id) {
+          try {
+            const coverInfo = await MangadexService.callProxy(`/cover/${relCover.id}`);
+            const cdata = coverInfo?.data || coverInfo;
+            const file = cdata?.attributes?.fileName;
+            if (file) coverUrl = `https://uploads.mangadex.org/covers/${id}/${file}`;
+          } catch(e){}
+        }
+
+        // tags
+        const tags = (data?.attributes?.tags||[]).map(t => (t?.attributes?.name && (t.attributes.name.en || Object.values(t.attributes.name||{})[0])) || '').filter(Boolean);
+
+        // chapter fetch helpers: prefer using availableTranslatedLanguages attribute
+        async function fetchChaptersForLang(code) {
+          // first request to get total for this language
+          const summary = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=1`);
+          const total = summary?.total || 0;
+          if (!total) return [];
+          const cap = Math.min(total, 1000); // safety cap
+          const res = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=${cap}`);
+          return res?.data || [];
+        }
+
+        // map language code to friendly name
+        const LANG_NAMES = {
+          en: 'English', ru: 'Русский', tr: 'Türkçe', ja: '日本語', es: 'Español', fr: 'Français', pt: 'Português', 'pt-br': 'Português (BR)'
+        };
+
+        async function buildLanguageOptions() {
+          const area = document.getElementById('langArea');
+          area.innerHTML = 'Loading available translations...';
+          try {
+            // prefer attribute list if present
+            const avail = attr?.availableTranslatedLanguages || [];
+            let langs = [];
+            if (avail && avail.length) {
+              langs = avail.slice();
+            } else {
+              // fallback: inspect chapters to discover languages (less optimal)
+              const summary = await MangadexService.callProxy(`/chapter?manga=${id}&limit=1`);
+              const total = summary?.total || 0;
+              if (!total) { area.innerHTML = '<div style="color:#666">No translations available</div>'; return {langs:[]}; }
+              const cap = Math.min(total, 1000);
+              const all = await MangadexService.callProxy(`/chapter?manga=${id}&limit=${cap}`);
+              const chapters = all?.data || [];
+              langs = Array.from(new Set((chapters||[]).map(c=>c.attributes?.translatedLanguage).filter(Boolean)));
+            }
+
+            if (!langs.length) { area.innerHTML = '<div style="color:#666">No translations available</div>'; return {langs:[]}; }
+
+            // render radios
+            const html = langs.map((code,i)=>{
+              const name = LANG_NAMES[code] || code;
+              return `<label style="margin-right:10px"><input type=radio name=lang value=\"${escapeHtml(code)}\" ${i===0? 'checked':''}/> ${escapeHtml(name)}</label>`;
+            }).join('');
+            area.innerHTML = `<div>${html}</div><div style=\"margin-top:8px\"><button id=\"startRead\" class=\"btn\">Start reading (first)</button></div>`;
+            return { langs };
+          } catch (e) {
+            area.innerHTML = '<div style="color:#c00">Error loading translations</div>';
+            console.warn(e);
+            return {langs:[]};
+          }
+        }
+
+        async function renderChaptersForLang(list) {
+          const area = document.getElementById('chaptersArea');
+          const l = (list||[]).slice();
+          if (!l.length) { area.innerHTML = '<div style="color:#666">Нет глав для выбранного языка</div>'; return; }
+          // sort by readableAt ascending (so reading starts at earliest)
+          l.sort((a,b)=> new Date(a.attributes.readableAt) - new Date(b.attributes.readableAt));
+          const rows = l.map(c=>{
+            const ch = c.attributes?.chapter || '';
+            const title = c.attributes?.title || '';
+            const pages = c.attributes?.pages || 0;
+            return `<div style=\"display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px solid #f0f0f0\">`+
+              `<div>${escapeHtml(ch||'—')} ${escapeHtml(title||'')}</div>`+
+              `<div style=\"display:flex; gap:8px\"><div style=\"color:#666; font-size:13px\">${pages}p</div>`+
+              `<button class=\"btn readBtn\" data-id=\"${c.id}\">Read</button></div>`+
+              `</div>`;
+          }).join('');
+          area.innerHTML = `<h3>Chapters (${l.length})</h3><div>${rows}</div>`;
+          // wire buttons
+          area.querySelectorAll('.readBtn').forEach(b=>{
+            b.addEventListener('click', ()=>{
+              const cid = b.dataset.id;
+              window.location.href = `/reader.html?chapterId=${encodeURIComponent(cid)}`;
+            });
+          });
+        }
+
+        
+
+        content.innerHTML = `
+          <div style="display:flex; gap:18px">
+            <div style="width:220px">
+              <img class="thumb" src="${coverUrl}" alt="${escapeHtml(title)}" />
+            </div>
+            <div style="flex:1">
+              <h1>${escapeHtml(title)}</h1>
+              <div class="meta">${escapeHtml(alt)} ${year ? ' · '+escapeHtml(String(year)) : ''} ${statusText ? ' · '+escapeHtml(statusText) : ''}</div>
+              <div class="tags">${tags.map(t=>`<span class=\"tag\">${escapeHtml(t)}</span>`).join('')}</div>
+            <h3>Описание</h3>
+            <pre class="desc">${escapeHtml(desc)}</pre>
+
+            <h3>Доступные переводы</h3>
+            <div id="langArea">Загрузка...</div>
+            <div id="chaptersArea" style="margin-top:12px"></div>
+            </div>
+          </div>
+        `;
+        // after rendering the page content, build languages
+        (async ()=>{
+          const {langs} = await buildLanguageOptions();
+          if (!langs || !langs.length) return;
+          // when radio changes, fetch and render chapters for that language
+          const radios = document.getElementsByName('lang');
+          radios.forEach(r => r.addEventListener('change', async ()=>{
+            const code = document.querySelector('input[name=lang]:checked').value;
+            const list = await fetchChaptersForLang(code);
+            await renderChaptersForLang(list);
+          }));
+          // render initial
+          const cur = document.querySelector('input[name=lang]:checked').value;
+          const initialList = await fetchChaptersForLang(cur);
+          await renderChaptersForLang(initialList);
+          // start reading button: open first chapter in chosen language
+          document.getElementById('startRead').addEventListener('click', async ()=>{
+            const code = document.querySelector('input[name=lang]:checked').value;
+            const lst = await fetchChaptersForLang(code);
+            const sorted = lst.slice().sort((a,b)=> new Date(a.attributes.readableAt) - new Date(b.attributes.readableAt));
+            if (!sorted.length) return alert('No chapters for this language');
+            const firstId = sorted[0].id;
+            window.location.href = `/reader.html?chapterId=${encodeURIComponent(firstId)}`;
+          });
+        })();
+      } catch (err) {
+        content.innerHTML = '<div style="color:#c00">Error loading manga: '+escapeHtml(String(err))+'</div>';
+      }
+    }
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+
+    load();
+  </script>
+</body>
+</html>

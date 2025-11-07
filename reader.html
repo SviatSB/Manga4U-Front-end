@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Reader</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    body { padding:12px; font-family: system-ui,Segoe UI,Roboto,Arial; background:#fff; color:#111 }
+    .panel { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; margin-bottom:12px }
+    .btn { padding:8px 12px; border-radius:6px; border:1px solid #bbb; background:#fafafa; cursor:pointer }
+    .pages { display:flex; flex-direction:column; gap:12px }
+    .pages img { max-width:100%; height:auto; border:1px solid #eee; border-radius:6px }
+    .controls { display:flex; gap:10px; align-items:center }
+  </style>
+</head>
+<body>
+  <header class="panel" style="display:flex; align-items:center; gap:10px">
+    <nav aria-label="Main">
+      <a class="btn" href="/mangadex-test.html">Tester</a>
+      <a class="btn" href="/mangadex-search.html">Search</a>
+      <a class="btn" href="/mangadex-new.html">New</a>
+      <a class="btn" href="/mangadex-popular.html">Popular</a>
+    </nav>
+  </header>
+
+  <div class="panel">
+    <div id="status">Loading chapter...</div>
+    <div style="margin-top:8px" class="controls">
+      <label><input type="checkbox" id="useSaver"/> Use dataSaver</label>
+      <button id="reload" class="btn">Reload pages</button>
+      <a id="openBase" class="btn" href="#" target="_blank">Open baseUrl</a>
+    </div>
+  </div>
+
+  <div id="content" class="pages"></div>
+
+  <script type="module">
+    import './js/api.client.js';
+    import MangadexService from './js/mangadex.service.js';
+
+    function qs(name) { const m = location.search.match(new RegExp('[?&]'+name+'=([^&]+)')); return m ? decodeURIComponent(m[1]) : null; }
+    const chapterId = qs('chapterId');
+    const status = document.getElementById('status');
+    const content = document.getElementById('content');
+    const useSaver = document.getElementById('useSaver');
+    const reloadBtn = document.getElementById('reload');
+    const openBase = document.getElementById('openBase');
+
+    async function loadPages() {
+      if (!chapterId) { status.textContent = 'No chapterId provided'; return; }
+      status.textContent = 'Fetching at-home server...';
+      try {
+        const res = await MangadexService.callProxy(`/at-home/server/${chapterId}`);
+        // sample: { baseUrl, chapter: { hash, data: [...], dataSaver: [...] } }
+        const base = res?.baseUrl;
+        const chapter = res?.chapter || {};
+        const hash = chapter.hash;
+        const files = (useSaver.checked ? chapter.dataSaver : chapter.data) || [];
+        if (!base || !hash || !files.length) {
+          status.textContent = 'No pages available for this chapter';
+          return;
+        }
+        status.textContent = `Pages: ${files.length}`;
+        openBase.href = base;
+        openBase.textContent = 'Open baseUrl';
+        content.innerHTML = '';
+        for (const f of files) {
+          const img = document.createElement('img');
+          img.src = `${base}/data/${hash}/${f}`;
+          img.alt = f;
+          content.appendChild(img);
+        }
+      } catch (err) {
+        status.textContent = 'Error loading pages: '+(err.message||err);
+        content.innerHTML = '';
+      }
+    }
+
+    reloadBtn.addEventListener('click', loadPages);
+    useSaver.addEventListener('change', loadPages);
+
+    loadPages();
+  </script>
+</body>
+</html>

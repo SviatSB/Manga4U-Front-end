@@ -211,6 +211,11 @@
 
         card.appendChild(img);
         card.appendChild(meta);
+        // make card clickable to open detail page
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+          window.location.href = `/manga.html?id=${encodeURIComponent(id)}`;
+        });
         grid.appendChild(card);
 
         const rel = (item.relationships || []).find(r => r.type === 'cover_art');
