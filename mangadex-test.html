@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mangadex Service Test</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    /* Light theme and compact layout */
+    body { padding: 20px; font-family: system-ui,Segoe UI,Roboto,Arial; background: #fff; color: #111 }
+    .controls { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start }
+    input, textarea { padding:8px; font-size:14px; border:1px solid #ddd; border-radius:4px }
+    label { display:block; font-size:13px; color:#222 }
+    pre { background:#f6f6f6; color:#111; padding:12px; max-height:60vh; overflow:auto; border:1px solid #eee }
+    .btn { padding:8px 12px; cursor:pointer; border:1px solid #bbb; background:#fafafa; border-radius:6px }
+    .panel { background: #fff; border:1px solid #eee; padding:12px; border-radius:6px }
+  </style>
+</head>
+<body>
+  <header class="panel" style="display:flex; align-items:center; gap:10px; margin-bottom:14px">
+    <nav aria-label="Main">
+      <a class="btn" href="/mangadex-test.html">Tester</a>
+      <a class="btn" href="/mangadex-search.html">Search</a>
+      <a class="btn" href="/mangadex-new.html">New</a>
+      <a class="btn" href="/mangadex-popular.html">Popular</a>
+    </nav>
+  </header>
+
+  <h1>Mangadex Proxy Tester</h1>
+
+  <div class="controls">
+    <div style="display:flex; flex-direction:column; gap:10px; min-width:360px">
+      <label>Proxy path
+        <input id="path" placeholder="/manga/tag or /manga?title=one" style="width:100%" />
+      </label>
+
+      <label>Headers (JSON, optional)
+        <textarea id="headers" placeholder='{"X-Custom":"value"}' style="height:90px; width:100%"></textarea>
+      </label>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; flex:1; justify-content:flex-start">
+      <div style="display:flex; gap:8px">
+        <button id="send" class="btn">Send GET</button>
+        <button id="exampleTags" class="btn">/manga/tag</button>
+        <button id="exampleSearch" class="btn">/manga?title=one</button>
+      </div>
+
+      <div style="color:#666; font-size:13px">Note: this tester only performs GET requests (proxy path is appended to /api/mangadexproxy).</div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; display:flex; gap:12px">
+    <div style="flex:1">
+      <strong>Response</strong>
+      <div id="respSummary" style="margin:6px 0; color:#333">(no request yet)</div>
+      <pre id="resp" style="white-space:pre-wrap; word-break:break-word;">(response will appear here)</pre>
+    </div>
+
+    <div style="width:320px">
+      <strong>Debug</strong>
+      <div style="font-size:13px; color:#444; margin-top:6px">Request URL (sent):</div>
+      <div id="sentUrl" style="font-family:monospace; font-size:13px; color:#111; background:#f6f6f6; padding:8px; margin-top:6px; white-space:pre-wrap;">-</div>
+    </div>
+  </div>
+
+  <script type="module">
+    // optional project api client (adds auth headers) — load if present
+    try { await import('./js/api.client.js'); } catch(e){ /* ignore if not present */ }
+
+    const $ = sel => document.querySelector(sel);
+    const sendBtn = $('#send');
+    const resp = $('#resp');
+    const summary = $('#respSummary');
+    const sentUrl = $('#sentUrl');
+
+    function pretty(v){ try { return JSON.stringify(v, null, 2); } catch(e){ return String(v); } }
+
+    function buildProxyUrl(path){
+      if (!path) return '/api/mangadexproxy?path=' + encodeURIComponent('');
+      if (/^https?:\/\//i.test(path)) return path;
+      return '/api/mangadexproxy?path=' + encodeURIComponent(path);
+    }
+
+    async function send() {
+      const method = 'GET';
+      const path = $('#path').value.trim();
+      let headers = {};
+      const headersText = $('#headers').value.trim();
+      if (headersText) {
+        try { headers = JSON.parse(headersText); }
+        catch(err){ summary.textContent = 'Invalid headers JSON: ' + err.message; return; }
+      }
+
+      const url = buildProxyUrl(path);
+      sentUrl.textContent = url + '\n\nMethod: ' + method;
+      summary.textContent = 'Sending...';
+      resp.textContent = '';
+
+      // prefer window.apiFetch (adds auth), otherwise use fetch
+      const useApiFetch = typeof window.apiFetch === 'function';
+      const opts = { method, headers };
+
+      try {
+        const fetcher = useApiFetch ? window.apiFetch : fetch.bind(window);
+        const r = await fetcher(url, opts);
+        if (r && typeof r.json === 'function') {
+          const status = r.status;
+          const statusText = r.statusText;
+          let data;
+          const ct = r.headers.get('content-type') || '';
+          if (ct.includes('application/json')) {
+            try { data = await r.json(); }
+            catch(e){ data = await r.text(); }
+          } else {
+            data = await r.text();
+            try { data = JSON.parse(data); } catch(e){}
+          }
+          summary.textContent = `Status: ${status} ${statusText}`;
+          const headersObj = {};
+          r.headers.forEach((v,k)=> headersObj[k]=v);
+          resp.textContent = 'Response headers:\n' + JSON.stringify(headersObj, null, 2) + '\n\nBody:\n' + pretty(data);
+        } else {
+          const data = r;
+          summary.textContent = 'Status: 200 (OK) — parsed result';
+          resp.textContent = pretty(data);
+        }
+      } catch (err) {
+        summary.textContent = 'Request failed: ' + (err.message||String(err));
+        resp.textContent = String(err.stack || err);
+      }
+    }
+
+    sendBtn.addEventListener('click', send);
+    $('#exampleTags').addEventListener('click', ()=>{ $('#path').value='/manga/tag'; $('#headers').value=''; });
+    $('#exampleSearch').addEventListener('click', ()=>{ $('#path').value='/manga?title=one'; $('#headers').value=''; });
+
+    // quick expose for console
+    window.proxyTester = { send };
+
+    // initial hint
+    summary.textContent = 'Ready — enter a proxy path and press Send';
+  </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mangadex — Поиск</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    /* Light theme and tidy layout for search */
+    body { padding:18px; font-family: system-ui,Segoe UI,Roboto,Arial; background:#fff; color:#111 }
+    h1 { margin-bottom:12px }
+    .panel { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px }
+    .controls { display:flex; gap:12px; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap }
+    .controls input, .controls select, textarea { padding:8px; border:1px solid #ddd; border-radius:6px }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill,minmax(220px,1fr)); gap:14px; margin-top:12px }
+    .card { border:1px solid #e9e9e9; padding:10px; border-radius:6px; background:#fff; display:flex; gap:10px }
+    .thumb { width:100px; height:150px; background:#f6f6f6; flex:0 0 100px; object-fit:cover }
+    .meta { flex:1; display:flex; flex-direction:column }
+    .title { font-weight:700; margin-bottom:6px }
+    .subtitle { color:#666; font-size:13px; margin-bottom:8px }
+    .tags { margin-top:auto; display:flex; flex-wrap:wrap; gap:6px }
+    .tag { background:#f3f3f3; padding:4px 6px; border-radius:4px; font-size:12px }
+    .desc { font-size:13px; color:#333; max-height:72px; overflow:hidden }
+    .btn { padding:8px 12px; border-radius:6px; border:1px solid #bbb; background:#fafafa; cursor:pointer }
+  </style>
+</head>
+<body>
+  <header class="panel" style="display:flex; align-items:center; gap:10px; margin-bottom:14px">
+    <nav aria-label="Main">
+      <a class="btn" href="/mangadex-test.html">Tester</a>
+      <a class="btn" href="/mangadex-search.html">Search</a>
+      <a class="btn" href="/mangadex-new.html">New</a>
+      <a class="btn" href="/mangadex-popular.html">Popular</a>
+    </nav>
+  </header>
+
+  <h1>Поиск</h1>
+
+  <div class="controls">
+      <label>Title <input id="title" placeholder="one piece" /></label>
+    <label style="min-width:260px">Genres
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <input id="genreFilter" placeholder="Filter genres..." style="padding:6px; width:240px" />
+        <div id="genres" style="min-width:240px; max-height:280px; overflow:auto; border:1px solid #e6e6e6; padding:8px; background:#fff"></div>
+      </div>
+    </label>
+    <div style="display:flex; flex-direction:column; gap:6px">
+      <div>
+        <button id="searchBtn" class="btn">Search</button>
+        <button id="refreshTagsBtn" class="btn" title="Refresh tag id cache">Refresh tags</button>
+      </div>
+      <div style="display:flex; gap:6px; align-items:center">
+        <button id="prev" class="btn">‹ Prev</button>
+        <div>Page <strong id="pageDisplay">1</strong></div>
+        <button id="next" class="btn">Next ›</button>
+      </div>
+      <label>Limit <input id="limitInput" value="20" style="width:66px; margin-left:6px" /></label>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:12px">
+    <div id="status">Загрузка жанров...</div>
+    <div id="tagMap" style="margin:8px 0; font-size:13px; color:#333"></div>
+  </div>
+  <div id="grid" class="grid" aria-live="polite"></div>
+
+  <script type="module">
+    import './js/api.client.js';
+    import MangadexService from './js/mangadex.service.js';
+
+    const titleEl = document.getElementById('title');
+    const genresEl = document.getElementById('genres');
+    const searchBtn = document.getElementById('searchBtn');
+    const grid = document.getElementById('grid');
+    const status = document.getElementById('status');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const pageDisplay = document.getElementById('pageDisplay');
+    const limitInput = document.getElementById('limitInput');
+
+    let currentPage = 1;
+    let currentLimit = parseInt(limitInput.value,10) || 20;
+    let totalPages = 1;
+    let lastQuery = { title: '', genres: [] };
+
+    function firstLang(obj) {
+      if (!obj) return null;
+      if (typeof obj === 'string') return obj;
+      const keys = Object.keys(obj);
+      for (const k of ['en','en-us','en-gb']) if (obj[k]) return obj[k];
+      return obj[keys[0]];
+    }
+
+    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+    function truncate(s, n=260) { if (!s) return ''; return s.length>n ? s.slice(0,n).trim() + '...' : s; }
+
+    // load tags from Mangadex via proxy and render grouped checkboxes
+    async function loadGenres() {
+      genresEl.innerHTML = '';
+      status.textContent = 'Загрузка жанров...';
+      try {
+        // ensure tag cache and get tags
+        const cache = await MangadexService._ensureTagCache();
+        const tags = cache?.tags || [];
+        // group tags by attributes.group
+        const groups = {};
+        for (const t of tags) {
+          const group = (t.attributes?.group || 'other').toString();
+          groups[group] = groups[group] || [];
+          groups[group].push(t);
+        }
+
+        // render groups (use pretty group names)
+        const nice = name => {
+          if (!name) return 'other';
+          return name[0].toUpperCase() + name.slice(1);
+        };
+
+        for (const groupName of Object.keys(groups)) {
+          const field = document.createElement('fieldset');
+          field.style.border = 'none';
+          field.style.margin = '0 0 8px 0';
+          const legend = document.createElement('legend');
+          legend.textContent = nice(groupName);
+          legend.style.fontWeight = '600';
+          legend.style.marginBottom = '6px';
+          field.appendChild(legend);
+
+          const list = document.createElement('div');
+          list.style.display = 'flex';
+          list.style.flexWrap = 'wrap';
+          list.style.gap = '6px';
+
+          for (const tagObj of groups[groupName]) {
+            const tagName = tagObj.attributes?.name?.en || Object.values(tagObj.attributes?.name||{})[0] || tagObj.id;
+            const id = tagObj.id;
+            const lbl = document.createElement('label');
+            lbl.style.display = 'inline-flex';
+            lbl.style.alignItems = 'center';
+            lbl.style.gap = '6px';
+            lbl.style.background = '#fff';
+
+            const inp = document.createElement('input');
+            inp.type = 'checkbox';
+            inp.value = id; // use UUID as value
+            inp.id = `tag-${id}`;
+            inp.dataset.group = groupName;
+
+            const span = document.createElement('span');
+            span.textContent = tagName;
+            span.style.fontSize = '13px';
+
+            lbl.appendChild(inp);
+            lbl.appendChild(span);
+            list.appendChild(lbl);
+          }
+
+          field.appendChild(list);
+          genresEl.appendChild(field);
+        }
+
+        status.textContent = `Жанров загружено: ${tags.length}`;
+
+        // hook up filter
+        const filter = document.getElementById('genreFilter');
+        filter.addEventListener('input', () => {
+          const q = filter.value.trim().toLowerCase();
+          const labels = genresEl.querySelectorAll('label');
+          labels.forEach(lbl => {
+            const txt = lbl.textContent.trim().toLowerCase();
+            lbl.style.display = txt.includes(q) ? '' : 'none';
+          });
+        });
+      } catch (err) {
+        status.textContent = 'Не удалось загрузить жанры';
+        console.warn('Failed to load genres via proxy:', err);
+      }
+    }
+
+    async function renderList(items) {
+      grid.innerHTML = '';
+      const coverPromises = [];
+      for (const item of items) {
+        const id = item.id;
+        const a = item.attributes || {};
+        const title = firstLang(a.title) || '(No title)';
+        const alt = (a.altTitles && a.altTitles.length) ? firstLang(a.altTitles[0]) : '';
+        const desc = firstLang(a.description) || '';
+        const tags = (a.tags||[]).map(t => (t?.attributes?.name && firstLang(t.attributes.name)) || '').filter(Boolean);
+
+        const card = document.createElement('article');
+        card.className = 'card';
+
+        const img = document.createElement('img');
+        img.className = 'thumb';
+        img.alt = title;
+        img.src = '/css/placeholder.png';
+
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        meta.innerHTML = `
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="subtitle">${escapeHtml(alt)}</div>
+          <div class="desc">${escapeHtml(truncate(desc, 300))}</div>
+        `;
+
+        const tagsWrap = document.createElement('div');
+        tagsWrap.className = 'tags';
+        for (const t of tags) { const el=document.createElement('div'); el.className='tag'; el.textContent=t; tagsWrap.appendChild(el); }
+        meta.appendChild(tagsWrap);
+
+        card.appendChild(img);
+        card.appendChild(meta);
+        grid.appendChild(card);
+
+        const rel = (item.relationships || []).find(r => r.type === 'cover_art');
+        if (rel && rel.id) {
+          const p = MangadexService.callProxy(`/cover/${rel.id}`)
+            .then(res => {
+              const data = res?.data || res;
+              const fileName = data?.attributes?.fileName;
+              if (fileName) img.src = `https://uploads.mangadex.org/covers/${id}/${fileName}`;
+            }).catch(()=>{});
+          coverPromises.push(p);
+        }
+      }
+      await Promise.allSettled(coverPromises);
+    }
+
+    function getSelectedGenres() {
+      const vals = Array.from(genresEl.querySelectorAll('input[type=checkbox]:checked')).map(i => i.value).filter(Boolean);
+      return vals;
+    }
+
+    async function showTagMapping(selectedIds) {
+      const out = document.getElementById('tagMap');
+      out.innerHTML = 'Resolving tags...';
+      try {
+        const cache = await MangadexService._ensureTagCache();
+        const tags = cache?.tags || [];
+        const byId = new Map(tags.map(t => [t.id, t]));
+        const rows = [];
+        for (let i=0;i<selectedIds.length;i++) {
+          const id = selectedIds[i];
+          const tag = byId.get(id);
+          const name = tag ? (tag.attributes?.name?.en || Object.values(tag.attributes?.name||{})[0]) : '(unknown)';
+          rows.push(`<div>${escapeHtml(name)} → ${id ? `<code>${id}</code>` : '<span style="color:#c00">(not found)</span>'}</div>`);
+        }
+        out.innerHTML = rows.join('');
+      } catch (err) {
+        out.innerHTML = 'Error resolving tags: '+escapeHtml(String(err));
+      }
+    }
+
+    async function doSearch(page = 1) {
+      try {
+        currentLimit = parseInt(limitInput.value,10) || 20;
+        const title = titleEl.value.trim();
+        const genres = getSelectedGenres();
+        // show mapping for user feedback (IDs -> names)
+        showTagMapping(genres);
+        lastQuery = { title, genres };
+        status.textContent = 'Поиск...';
+        // genres are UUIDs now, send directly
+        const res = await MangadexService.search({ title, genres, page, limit: currentLimit });
+        const items = res?.data || [];
+        const total = res?.total || items.length || 0;
+        totalPages = Math.max(1, Math.ceil(total / currentLimit));
+        currentPage = page;
+        pageDisplay.textContent = String(currentPage);
+        prevBtn.disabled = currentPage <= 1;
+        nextBtn.disabled = currentPage >= totalPages;
+        if (!items.length) status.textContent = 'Нет результатов'; else status.textContent = `Показаны ${items.length} из ${total}`;
+        await renderList(items);
+      } catch (err) {
+        status.textContent = 'Ошибка поиска: ' + (err.message || err);
+        grid.innerHTML = '<pre>'+escapeHtml(String(err))+'</pre>';
+      }
+    }
+
+    searchBtn.addEventListener('click', () => doSearch(1));
+    prevBtn.addEventListener('click', () => { if (currentPage>1) doSearch(currentPage-1); });
+    nextBtn.addEventListener('click', () => { if (currentPage<totalPages) doSearch(currentPage+1); });
+    limitInput.addEventListener('change', () => doSearch(1));
+    document.getElementById('refreshTagsBtn').addEventListener('click', async () => {
+      status.textContent = 'Обновление кеша тегов...';
+      try {
+        await MangadexService.refreshTagCache();
+        status.textContent = 'Кеш тегов обновлён';
+        // reload the rendered genre list so the UI reflects the refreshed cache
+        await loadGenres();
+      } catch (err) {
+        status.textContent = 'Ошибка обновления кеша: '+(err.message||err);
+      }
+    });
+
+    // initial render of tag groups
+    await loadGenres();
+  </script>
+</body>
+</html>
