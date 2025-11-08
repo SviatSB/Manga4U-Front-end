@@ -71,14 +71,35 @@
         const tags = (data?.attributes?.tags||[]).map(t => (t?.attributes?.name && (t.attributes.name.en || Object.values(t.attributes.name||{})[0])) || '').filter(Boolean);
 
         // chapter fetch helpers: prefer using availableTranslatedLanguages attribute
+        // cache fetched chapters per language to avoid repeat requests
+        const chapterCache = {};
         async function fetchChaptersForLang(code) {
+          if (!code) return [];
+          if (chapterCache[code]) return chapterCache[code];
           // first request to get total for this language
           const summary = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=1`);
           const total = summary?.total || 0;
-          if (!total) return [];
-          const cap = Math.min(total, 1000); // safety cap
-          const res = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=${cap}`);
-          return res?.data || [];
+          if (!total) {
+            chapterCache[code] = [];
+            return [];
+          }
+          // paginate in batches to retrieve all chapters (bounded cap to avoid runaway)
+          const MAX_CAP = 2000; // absolute safety cap
+          const batch = 100; // reasonable per-request batch (reduced as requested)
+          const toFetch = Math.min(total, MAX_CAP);
+          const pages = Math.ceil(toFetch / batch);
+          const all = [];
+          for (let i = 0; i < pages; i++) {
+            const offset = i * batch;
+            const res = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=${batch}&offset=${offset}`);
+            const data = res?.data || [];
+            if (!data.length) break;
+            all.push(...data);
+            // if less than batch returned, we reached the end early
+            if (data.length < batch) break;
+          }
+          chapterCache[code] = all;
+          return all;
         }
 
         // map language code to friendly name
