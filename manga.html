@@ -1,227 +1,165 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uk">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Manga — details</title>
+  <title>Манґа — інформація</title>
   <link rel="stylesheet" href="/css/main.css" />
-  <style>
-    body { padding:18px; font-family: system-ui,Segoe UI,Roboto,Arial; background:#fff; color:#111 }
-    .panel { background:#fff; border:1px solid #eee; padding:12px; border-radius:8px; margin-bottom:12px }
-    .btn { padding:8px 12px; border-radius:6px; border:1px solid #bbb; background:#fafafa; cursor:pointer; text-decoration:none; color:inherit }
-    .layout { display:grid; grid-template-columns: 220px 1fr; gap:18px }
-    .thumb { width:220px; height:330px; object-fit:cover; background:#f6f6f6; border:1px solid #eee; border-radius:6px }
-    h1 { margin:0 0 8px 0 }
-    .meta { color:#444; font-size:14px; margin-bottom:8px }
-    .tags { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 }
-    .tag { background:#f3f3f3; padding:6px 8px; border-radius:6px; font-size:13px }
-    pre.desc { background:#f6f6f6; padding:12px; border-radius:6px; white-space:pre-wrap }
-  </style>
+  <link rel="stylesheet" href="/css/manga.css" />
 </head>
 <body>
-  <header class="panel" style="display:flex; align-items:center; gap:10px">
-    <nav aria-label="Main">
-      <a class="btn" href="/mangadex-test.html">Tester</a>
-      <a class="btn" href="/mangadex-search.html">Search</a>
-      <a class="btn" href="/mangadex-new.html">New</a>
-      <a class="btn" href="/mangadex-popular.html">Popular</a>
-    </nav>
-  </header>
 
-  <div id="content" class="panel">
-    <div id="status">Loading...</div>
-  </div>
+  <header class="header">
+      <div class="header__bar">
+        <a class="logo" href="./index.html">
+          <span class="logo__badge">M4U</span>
+          <span class="logo__word">Manga4U</span>
+        </a>
 
-  <script type="module">
-    import './js/api.client.js';
-    import MangadexService from './js/mangadex.service.js';
+        <nav class="nav" aria-label="Основна навігація">
+          <a class="navbtn" href="./mangadex-search.html">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <circle
+                cx="11"
+                cy="11"
+                r="6.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path
+                d="M16.5 16.5L21 21"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Пошук</span>
+          </a>
 
-    function qs(name) { const m = location.search.match(new RegExp('[?&]'+name+'=([^&]+)')); return m ? decodeURIComponent(m[1]) : null; }
+          <a class="navbtn guard-required" href="./favorites.html" data-guard="favorites">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 20s-7.5-4.7-9.2-8.4C1.7 9.1 3.1 6.5 6 6.2c1.7-.2 3.2.7 4 2 0 0 .8-2.1 3.7-2 2.9.1 4.7 2.8 3.5 5.4C15.7 16 12 20 12 20z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Улюблені</span>
+          </a>
 
-    const id = qs('id');
-    const content = document.getElementById('content');
-    async function load() {
-      if (!id) { content.innerHTML = '<div style="color:#c00">No manga id provided in query (use ?id=...)</div>'; return; }
-      content.innerHTML = '<div id="status">Loading manga...</div>';
-      try {
-        // fetch manga details via proxy
-        const res = await MangadexService.callProxy(`/manga/${id}`);
-        // Mangadex returns object with data
-        const data = res?.data || res;
-        const attr = data?.attributes || {};
-        const title = (attr?.title && (attr.title.en || Object.values(attr.title||{})[0])) || '(No title)';
-        const alt = (attr?.altTitles && attr.altTitles.length) ? (attr.altTitles[0] && (attr.altTitles[0].en || Object.values(attr.altTitles[0]||{})[0])) : '';
-        const desc = (attr?.description && (attr.description.en || Object.values(attr.description||{})[0])) || '';
-        const statusText = attr?.status || '';
-        const year = attr?.year || '';
+          <a class="navbtn guard-required" href="./collections.html" data-guard="collections">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M12 12l8-4.5M12 12l-8-4.5M12 12v9"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Колекції</span>
+          </a>
 
-        // find cover relationship
-        const relCover = (data.relationships || []).find(r => r.type === 'cover_art');
-        let coverUrl = '/css/placeholder.png';
-        if (relCover && relCover.id) {
-          try {
-            const coverInfo = await MangadexService.callProxy(`/cover/${relCover.id}`);
-            const cdata = coverInfo?.data || coverInfo;
-            const file = cdata?.attributes?.fileName;
-            if (file) coverUrl = `https://uploads.mangadex.org/covers/${id}/${file}`;
-          } catch(e){}
-        }
+          <a
+            id="loginLink"
+            class="navbtn navbtn--accent"
+            href="./auth.html?next=./index.html"
+            hidden
+          >
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M10 7h8v10h-8M13 12H3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Увійти</span>
+          </a>
 
-        // tags
-        const tags = (data?.attributes?.tags||[]).map(t => (t?.attributes?.name && (t.attributes.name.en || Object.values(t.attributes.name||{})[0])) || '').filter(Boolean);
-
-        // chapter fetch helpers: prefer using availableTranslatedLanguages attribute
-        // cache fetched chapters per language to avoid repeat requests
-        const chapterCache = {};
-        async function fetchChaptersForLang(code) {
-          if (!code) return [];
-          if (chapterCache[code]) return chapterCache[code];
-          // first request to get total for this language
-          const summary = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=1`);
-          const total = summary?.total || 0;
-          if (!total) {
-            chapterCache[code] = [];
-            return [];
-          }
-          // paginate in batches to retrieve all chapters (bounded cap to avoid runaway)
-          const MAX_CAP = 2000; // absolute safety cap
-          const batch = 100; // reasonable per-request batch (reduced as requested)
-          const toFetch = Math.min(total, MAX_CAP);
-          const pages = Math.ceil(toFetch / batch);
-          const all = [];
-          for (let i = 0; i < pages; i++) {
-            const offset = i * batch;
-            const res = await MangadexService.callProxy(`/chapter?manga=${id}&translatedLanguage[]=${encodeURIComponent(code)}&limit=${batch}&offset=${offset}`);
-            const data = res?.data || [];
-            if (!data.length) break;
-            all.push(...data);
-            // if less than batch returned, we reached the end early
-            if (data.length < batch) break;
-          }
-          chapterCache[code] = all;
-          return all;
-        }
-
-        // map language code to friendly name
-        const LANG_NAMES = {
-          en: 'English', ru: 'Русский', tr: 'Türkçe', ja: '日本語', es: 'Español', fr: 'Français', pt: 'Português', 'pt-br': 'Português (BR)'
-        };
-
-        async function buildLanguageOptions() {
-          const area = document.getElementById('langArea');
-          area.innerHTML = 'Loading available translations...';
-          try {
-            // prefer attribute list if present
-            const avail = attr?.availableTranslatedLanguages || [];
-            let langs = [];
-            if (avail && avail.length) {
-              langs = avail.slice();
-            } else {
-              // fallback: inspect chapters to discover languages (less optimal)
-              const summary = await MangadexService.callProxy(`/chapter?manga=${id}&limit=1`);
-              const total = summary?.total || 0;
-              if (!total) { area.innerHTML = '<div style="color:#666">No translations available</div>'; return {langs:[]}; }
-              const cap = Math.min(total, 1000);
-              const all = await MangadexService.callProxy(`/chapter?manga=${id}&limit=${cap}`);
-              const chapters = all?.data || [];
-              langs = Array.from(new Set((chapters||[]).map(c=>c.attributes?.translatedLanguage).filter(Boolean)));
-            }
-
-            if (!langs.length) { area.innerHTML = '<div style="color:#666">No translations available</div>'; return {langs:[]}; }
-
-            // render radios
-            const html = langs.map((code,i)=>{
-              const name = LANG_NAMES[code] || code;
-              return `<label style="margin-right:10px"><input type=radio name=lang value=\"${escapeHtml(code)}\" ${i===0? 'checked':''}/> ${escapeHtml(name)}</label>`;
-            }).join('');
-            area.innerHTML = `<div>${html}</div><div style=\"margin-top:8px\"><button id=\"startRead\" class=\"btn\">Start reading (first)</button></div>`;
-            return { langs };
-          } catch (e) {
-            area.innerHTML = '<div style="color:#c00">Error loading translations</div>';
-            console.warn(e);
-            return {langs:[]};
-          }
-        }
-
-        async function renderChaptersForLang(list) {
-          const area = document.getElementById('chaptersArea');
-          const l = (list||[]).slice();
-          if (!l.length) { area.innerHTML = '<div style="color:#666">Нет глав для выбранного языка</div>'; return; }
-          // sort by readableAt ascending (so reading starts at earliest)
-          l.sort((a,b)=> new Date(a.attributes.readableAt) - new Date(b.attributes.readableAt));
-          const rows = l.map(c=>{
-            const ch = c.attributes?.chapter || '';
-            const title = c.attributes?.title || '';
-            const pages = c.attributes?.pages || 0;
-            return `<div style=\"display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px solid #f0f0f0\">`+
-              `<div>${escapeHtml(ch||'—')} ${escapeHtml(title||'')}</div>`+
-              `<div style=\"display:flex; gap:8px\"><div style=\"color:#666; font-size:13px\">${pages}p</div>`+
-              `<button class=\"btn readBtn\" data-id=\"${c.id}\">Read</button></div>`+
-              `</div>`;
-          }).join('');
-          area.innerHTML = `<h3>Chapters (${l.length})</h3><div>${rows}</div>`;
-          // wire buttons
-          area.querySelectorAll('.readBtn').forEach(b=>{
-            b.addEventListener('click', ()=>{
-              const cid = b.dataset.id;
-              window.location.href = `/reader.html?chapterId=${encodeURIComponent(cid)}`;
-            });
-          });
-        }
-
-        
-
-        content.innerHTML = `
-          <div style="display:flex; gap:18px">
-            <div style="width:220px">
-              <img class="thumb" src="${coverUrl}" alt="${escapeHtml(title)}" />
-            </div>
-            <div style="flex:1">
-              <h1>${escapeHtml(title)}</h1>
-              <div class="meta">${escapeHtml(alt)} ${year ? ' · '+escapeHtml(String(year)) : ''} ${statusText ? ' · '+escapeHtml(statusText) : ''}</div>
-              <div class="tags">${tags.map(t=>`<span class=\"tag\">${escapeHtml(t)}</span>`).join('')}</div>
-            <h3>Описание</h3>
-            <pre class="desc">${escapeHtml(desc)}</pre>
-
-            <h3>Доступные переводы</h3>
-            <div id="langArea">Загрузка...</div>
-            <div id="chaptersArea" style="margin-top:12px"></div>
+          <div class="profile" id="profileBlock" hidden>
+            <button
+              class="navbtn profile__btn"
+              id="profileBtn"
+              aria-expanded="false"
+              aria-controls="profileMenu"
+            >
+              <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+                <path
+                  d="М5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span class="navbtn__tx"><span id="profileName">Кабінет</span></span>
+              <span id="roleBadge" class="role-badge" hidden></span>
+            </button>
+            <div class="profile__menu" id="profileMenu" hidden>
+              <a href="./profile.html" class="profile__item">Редагувати профіль</a>
+              <a href="./admin-users.html" class="profile__item profile__item--admin" hidden>
+                Панель адміністратора
+              </a>
+              <hr class="profile__sep" />
+              <button class="profile__item" id="logoutBtn" type="button">Вийти</button>
             </div>
           </div>
-        `;
-        // after rendering the page content, build languages
-        (async ()=>{
-          const {langs} = await buildLanguageOptions();
-          if (!langs || !langs.length) return;
-          // when radio changes, fetch and render chapters for that language
-          const radios = document.getElementsByName('lang');
-          radios.forEach(r => r.addEventListener('change', async ()=>{
-            const code = document.querySelector('input[name=lang]:checked').value;
-            const list = await fetchChaptersForLang(code);
-            await renderChaptersForLang(list);
-          }));
-          // render initial
-          const cur = document.querySelector('input[name=lang]:checked').value;
-          const initialList = await fetchChaptersForLang(cur);
-          await renderChaptersForLang(initialList);
-          // start reading button: open first chapter in chosen language
-          document.getElementById('startRead').addEventListener('click', async ()=>{
-            const code = document.querySelector('input[name=lang]:checked').value;
-            const lst = await fetchChaptersForLang(code);
-            const sorted = lst.slice().sort((a,b)=> new Date(a.attributes.readableAt) - new Date(b.attributes.readableAt));
-            if (!sorted.length) return alert('No chapters for this language');
-            const firstId = sorted[0].id;
-            window.location.href = `/reader.html?chapterId=${encodeURIComponent(firstId)}`;
-          });
-        })();
-      } catch (err) {
-        content.innerHTML = '<div style="color:#c00">Error loading manga: '+escapeHtml(String(err))+'</div>';
-      }
-    }
+        </nav>
 
-    function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c]); }
+        <button class="burger" aria-label="Меню" aria-controls="mobileMenu" aria-expanded="false">
+          <span class="burger__line"></span>
+        </button>
+      </div>
+  </header>
 
-    load();
-  </script>
+    <!-- BG handwriting -->
+    <svg
+      class="bg-script"
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+      focusable="false"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <filter id="soft-glow">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <text x="50%" y="55%" text-anchor="middle" class="bg-script__text">Manga4U</text>
+    </svg>
+
+  <div id="content" class="panel">
+    <div id="status">Завантаження...</div>
+  </div>
+
+  <script type="module" src="/js/manga.js"></script>
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>

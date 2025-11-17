@@ -23,7 +23,7 @@
         </a>
 
         <nav class="nav" aria-label="Основна навігація">
-          <a class="navbtn" href="./search.html">
+          <a class="navbtn" href="./mangadex-search.html">
             <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
               <circle
                 cx="11"
@@ -207,16 +207,8 @@
         <div class="board">
           <article class="panel">
             <div class="panel__head">
-              <h3 class="panel__title">Жанри</h3>
-              <a class="panel__more" href="./genres.html">→</a>
-            </div>
-            <div class="grid grid--genres" id="genresGrid" data-fill="4"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel__head">
               <h3 class="panel__title">Новинки</h3>
-              <a class="panel__more" href="./new.html">→</a>
+              <a class="panel__more" href="./mangadex-new.html">→</a>
             </div>
             <div class="grid grid--tight" id="newGrid" data-fill="4"></div>
           </article>
@@ -224,21 +216,19 @@
           <article class="panel">
             <div class="panel__head">
               <h3 class="panel__title">Популярні</h3>
-              <a class="panel__more" href="./popular.html">→</a>
+              <a class="panel__more" href="./mangadex-popular.html">→</a>
             </div>
             <div class="grid grid--tight" id="popularGrid" data-fill="4"></div>
           </article>
-        </div>
-      </section>
 
-      <section class="section">
-        <article class="panel">
-          <div class="section__header">
-            <h3 class="section__title_Mod">Останні випуски</h3>
-            <a class="section__more" href="./latest.html">→</a>
-          </div>
-          <div class="grid grid--latest" id="latestGrid" data-fill="6" data-wide="true"></div>
-        </article>
+          <article class="panel">
+            <div class="panel__head">
+              <h3 class="panel__title">Історія</h3>
+              <a class="panel__more" href="./genres.html">→</a>
+            </div>
+            <div class="grid grid--genres" id="genresGrid" data-fill="4"></div>
+          </article>
+        </div>
       </section>
     </main>
 
@@ -246,6 +236,7 @@
       <p>© 2025 Manga4U</p>
     </footer>
 
+  <script type="module" src="/js/home-latest.js"></script>
   <script type="module" src="/js/main.js"></script>
   </body>
 </html>

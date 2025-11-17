@@ -1,0 +1,352 @@
+/* ===== Тёмный стиль страницы манги под main.css ===== */
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: 'Segoe UI', Inter, Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(1200px 800px at 20% -10%, rgba(139, 109, 216, 0.08), transparent 60%),
+    radial-gradient(1000px 700px at 120% 10%, rgba(139, 109, 216, 0.08), transparent 60%), var(--bg);
+}
+
+/* Панели (верх и блоки ниже) */
+.panel {
+  background: var(--panel);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin: 16px auto 16px;
+  max-width: 1100px; /* чтобы контент не растягивался на весь экран */
+}
+
+/* Основная сетка: обложка + инфо */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 0 auto 16px;
+  align-items: flex-start;
+}
+
+/* Обложка */
+.thumb {
+  width: 220px;
+  height: 330px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: #222028;
+  border: var(--border);
+
+  filter: brightness(0.78);
+  transition: filter 0.2s ease;
+}
+
+.thumb:hover {
+  filter: brightness(1);
+}
+
+/* Заголовок */
+h1 {
+  margin: 0 0 10px 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* Метаданные */
+.meta {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* Теги */
+.tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.tag {
+  background: #221b2c;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* Описание */
+.desc {
+  background: #09081666;
+  padding: 16px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  border: var(--border);
+  color: var(--text);
+}
+
+/* Заголовки секций (например "Главы") */
+h3 {
+  margin-top: 18px;
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Список глав */
+#chaptersArea {
+  margin-top: 12px;
+}
+
+#chaptersArea button.btn {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* Радио выбора языка */
+#langArea label {
+  color: var(--text);
+}
+
+#langArea input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+
+/* Основной layout (если ещё нет) */
+.layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 20px;
+}
+
+.layout__cover {
+  /* можно оставить пустым, размер задаёт .thumb */
+}
+
+.layout__main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Сообщения/ошибки */
+.manga-status {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.manga-error {
+  font-size: 14px;
+  color: #f66;
+}
+
+/* Блок языков */
+.lang-area {
+  margin-top: 8px;
+}
+
+.lang-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.lang-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.lang-option input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+.lang-start-wrap {
+  margin-top: 8px;
+}
+
+.lang-message {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.lang-message--error {
+  color: #f66;
+}
+
+/* Главы */
+.chapters-area {
+  margin-top: 12px;
+}
+
+.chapters__empty {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.chapters {
+  margin-top: 4px;
+}
+
+.chapters__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chapters__title {
+  flex: 1;
+  min-width: 0;
+}
+
+.chapters__right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chapters__meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* === MANGA4U BUTTONS — новый стиль === */
+.btn {
+  padding: 10px 18px;
+  border-radius: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(150, 110, 230, 0.25);
+  background: radial-gradient(
+      circle at top,
+      rgba(150, 110, 230, 0.2),
+      rgba(30, 20, 45, 0.7)
+    ),
+    linear-gradient(180deg, #18121f, #100b14);
+  color: #eae3ff;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.25s ease;
+  box-shadow: 0 0 0 rgba(150, 110, 230, 0.0);
+}
+
+.btn:hover {
+  border-color: rgba(180, 130, 255, 0.5);
+  box-shadow: 0 0 18px rgba(150, 110, 230, 0.4);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 6px rgba(150, 110, 230, 0.25);
+}
+
+/* Маленькие кнопки, напр.: "Читати" */
+.btn-small {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+/* Кнопка-акцент (например, Start Reading) */
+.btn-accent {
+  background: linear-gradient(180deg, #5f3bba, #452a8d);
+  border-color: rgba(220, 200, 255, 0.5);
+  box-shadow: 0 0 10px rgba(150, 110, 230, 0.6);
+}
+
+.btn-accent:hover {
+  box-shadow: 0 0 20px rgba(150, 110, 230, 0.9);
+}
+
+
+/* Адаптив под узкие экраны */
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .layout__cover {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+
+/* ===== Адаптив ===== */
+
+/* Планшеты и узкие ноуты — чуть уменьшим обложку */
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 180px 1fr;
+    gap: 16px;
+  }
+
+  .thumb {
+    width: 180px;
+    height: 270px;
+  }
+
+  h1 {
+    font-size: 24px;
+  }
+}
+
+/* Телефоны — всё вертикально: обложка сверху, текст ниже */
+@media (max-width: 640px) {
+  body {
+    padding: 12px;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .thumb {
+    width: 100%;
+    max-width: 260px;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    margin: 0 auto 12px;
+  }
+
+  h1 {
+    font-size: 22px;
+  }
+
+  .meta {
+    font-size: 13px;
+  }
+
+  .desc {
+    font-size: 13px;
+  }
+}
+
+/* Очень узкие экраны */
+@media (max-width: 400px) {
+  .thumb {
+    max-width: 220px;
+  }
+
+  h1 {
+    font-size: 19px;
+  }
+
+  .desc {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,149 @@
+/* ===== Reader — страница чтения главы ===== */
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  min-height: 100svh;
+  background:
+    radial-gradient(1200px 800px at 20% -10%, rgba(139, 109, 216, 0.08), transparent 60%),
+    radial-gradient(1000px 700px at 120% 10%, rgba(139, 109, 216, 0.08), transparent 60%),
+    var(--bg);
+}
+
+svg{
+    z-index: 0;
+}
+
+/* Контейнер страницы */
+.reader-main {
+  width: min(var(--container), 100% - 2 * var(--gutter));
+  margin: 10px auto 24px;
+}
+
+/* Контент (шапка + страницы) поверх фонового SVG */
+.reader-main {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* Хедер навигации сверху */
+.reader-header {
+  width: min(var(--container), 100% - 2 * var(--gutter));
+  margin: 10px auto 0;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.reader-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Переопределяем панели/кнопки под общий стиль (как на New/Popular) */
+.panel {
+  background: var(--panel);
+  border: var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+
+.btn {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, #14111c, #0f0d14);
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: rgba(139, 109, 216, 0.45);
+  box-shadow: 0 0 16px rgba(139, 109, 216, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Блок со статусом + переключатели */
+.reader-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.reader-controls__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+#status {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* Список страниц */
+.pages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Каждая страница манги */
+.pages img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: var(--border);
+  background: #0c0c10;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+
+.pages img {
+  position: relative;
+  z-index: 2;
+}
+
+
+/* Центруем страницы на больших экранах */
+@media (min-width: 900px) {
+  .pages {
+    align-items: center;
+  }
+
+  .pages img {
+    max-width: 900px;
+  }
+}
+
+/* Адаптив для телефонов */
+@media (max-width: 600px) {
+  .reader-header,
+  .reader-main {
+    width: 100%;
+    margin-inline: 0;
+    padding-inline: 12px;
+  }
+
+  .panel {
+    padding: 10px;
+  }
+
+  .reader-controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

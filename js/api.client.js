@@ -1,30 +1,34 @@
-// ===== Manga4U api.client.js (v3.1 — з підтримкою login і токена) =====
+// =====================================================
+//  Manga4U — api.client.js (v4, стабільна версія)
+// =====================================================
 
-// 🌍 Базова адреса бекенду (build-time через Vite). VITE_API_BASE обязателен.
+// 🔧 Базовий URL API (обовʼязково має бути в .env)
 const API_BASE = import.meta.env.VITE_API_BASE;
 if (!API_BASE) {
-  throw new Error('VITE_API_BASE is not set. Define it in .env.production/.env.development before building.');
+  throw new Error("❌ VITE_API_BASE is not set in .env");
 }
 
-// --------------------------------------------------
-// 🔐 TokenStore — єдиний механізм зберігання JWT
-// --------------------------------------------------
+// =====================================================
+//  JWT TokenStore
+// =====================================================
 const TokenStore = {
-  localKey: 'm4u_token',
-  sessionKey: 'm4u_token_session',
+  localKey: "m4u_token",
+  sessionKey: "m4u_token_session",
 
   get() {
     return (
       localStorage.getItem(this.localKey) ||
       sessionStorage.getItem(this.sessionKey) ||
-      sessionStorage.getItem('m4u_token') || // fallback для старих сторінок
       null
     );
   },
 
   set(token, remember = false) {
-    if (remember) localStorage.setItem(this.localKey, token);
-    else sessionStorage.setItem(this.sessionKey, token);
+    if (remember) {
+      localStorage.setItem(this.localKey, token);
+    } else {
+      sessionStorage.setItem(this.sessionKey, token);
+    }
   },
 
   clear() {
@@ -33,20 +37,18 @@ const TokenStore = {
   },
 };
 
-// --------------------------------------------------
-// 🌐 apiFetch — універсальний запит до API
-// --------------------------------------------------
+// =====================================================
+//  apiFetch — універсальний HTTP-клієнт
+// =====================================================
 async function apiFetch(path, options = {}) {
-  const token = localStorage.getItem('m4u_token') || sessionStorage.getItem('m4u_token');
+  const token = TokenStore.get();
+
   const headers = new Headers(options.headers || {});
-
-  // если отправляем JSON — ставим правильный заголовок
   if (options.body && !(options.body instanceof FormData)) {
-    headers.set('Content-Type', 'application/json');
+    headers.set("Content-Type", "application/json");
   }
-
   if (token) {
-    headers.set('Authorization', `Bearer ${token}`);
+    headers.set("Authorization", `Bearer ${token}`);
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
@@ -54,43 +56,43 @@ async function apiFetch(path, options = {}) {
     headers,
   });
 
-  const text = await response.text();
-  let data;
+  let text = await response.text();
+  let json;
   try {
-    data = text ? JSON.parse(text) : null;
+    json = text ? JSON.parse(text) : null;
   } catch {
-    data = text;
+    json = text;
   }
 
   if (!response.ok) {
-    const err = new Error(data?.message || data || response.statusText);
+    const err = new Error(json?.message || json || response.statusText);
     err.status = response.status;
+
+    // якщо токен протух — чистимо
+    if (err.status === 401) TokenStore.clear();
+
     throw err;
   }
 
-  return data;
+  return json;
 }
 
+// глобально
 window.apiFetch = apiFetch;
 
-// --------------------------------------------------
-// 👤 Auth — універсальний менеджер користувача
-// --------------------------------------------------
+
+// =====================================================
+//  Auth manager — login / me / logout
+// =====================================================
 window.Auth = {
-  /**
-   * Увійти в акаунт і зберегти токен
-   * @param {string} login
-   * @param {string} password
-   * @param {boolean} remember
-   */
   async login(login, password, remember = false) {
-    const res = await fetch(`${API_BASE}/api/Account/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const result = await fetch(`${API_BASE}/api/Account/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ login, password }),
     });
 
-    const text = await res.text();
+    const text = await result.text();
     let data;
     try {
       data = text ? JSON.parse(text) : null;
@@ -98,34 +100,26 @@ window.Auth = {
       data = text;
     }
 
-    if (!res.ok) {
-      const msg = data?.message || data || 'Помилка авторизації';
-      throw new Error(msg);
+    if (!result.ok) {
+      throw new Error(data?.message || "Login failed");
     }
 
     const token = data?.token;
-    if (!token) throw new Error('Сервер не повернув токен');
+    if (!token) throw new Error("Server did not return token");
 
     TokenStore.set(token, remember);
-    console.log('✅ Token saved:', token.slice(0, 30) + '...');
     return token;
   },
 
-  /**
-   * Отримати поточного користувача
-   * @param {boolean} strict - якщо true — кине помилку при 401
-   * @returns {Promise<object|null>}
-   */
   async me(strict = false) {
     const token = TokenStore.get();
     if (!token) {
-      if (strict) throw new Error('No token');
+      if (strict) throw new Error("No token");
       return null;
     }
 
     try {
-      const me = await apiFetch('/api/Account/me', { method: 'GET' });
-      return me;
+      return await apiFetch("/api/Account/me");
     } catch (err) {
       if (err.status === 401) TokenStore.clear();
       if (strict) throw err;
@@ -133,27 +127,11 @@ window.Auth = {
     }
   },
 
-  /**
-   * Перевірити роль користувача
-   * @param {object} user - обʼєкт користувача
-   * @param {string} role - назва ролі ("admin", "owner", "user")
-   */
-  hasRole(user, role) {
-    const roles = (user?.roles || user?.role || []).map((r) => String(r).toLowerCase());
-    return roles.includes(role.toLowerCase());
-  },
-
-  /**
-   * Вийти з акаунту
-   */
   logout() {
     TokenStore.clear();
-    location.href = './auth.html';
+    location.href = "./auth.html";
   },
 };
 
-// --------------------------------------------------
-// 🌎 Експортуємо глобально
-// --------------------------------------------------
-window.apiFetch = apiFetch;
+// експорти
 window.TokenStore = TokenStore;
