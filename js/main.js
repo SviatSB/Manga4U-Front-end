@@ -73,6 +73,59 @@ window.apiFetch = apiFetch;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+async function loadHomeHistory() {
+  const container = document.getElementById("genresGrid");
+  if (!container) return; // нет блока — выходим
+
+  try {
+    const res = await apiFetch("/api/history");
+
+    if (!Array.isArray(res) || res.length === 0) {
+      container.innerHTML = `<p style="opacity:.7;">Немає історії</p>`;
+      return;
+    }
+
+    // последние 4 записи
+    const recent = res
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+      .slice(0, 8);
+
+    container.innerHTML = "";
+
+    for (const item of recent) {
+      const chapterId =
+        item.lastChapterId || item.LastChapterId || item.chapterId;
+
+      const mangaName = item.mangaName || item.MangaName || "Невідома манґа";
+
+      const chapterNumber =
+        item.lastChapterNumber ?? item.LastChapterNumber ?? "?";
+
+      const chapterTitle =
+        item.lastChapterTitle || item.LastChapterTitle || "Без назви";
+
+      const div = document.createElement("div");
+      div.className = "genre-card panel__item";
+
+      div.innerHTML = `
+        <div class="history-title">${mangaName}</div>
+        <div class="history-subtitle">Розділ ${chapterNumber}</div>
+        <div class="history-small">${chapterTitle}</div>
+      `;
+
+
+      div.onclick = () => {
+        location.href = `/reader.html?chapterId=${chapterId}`;
+      };
+
+      container.appendChild(div);
+    }
+  } catch (err) {
+    console.error("Помилка завантаження історії на головній:", err);
+  }
+}
+
+
 /* ========= Авторизация ========= */
 async function getCurrentUser() {
   const token = TokenStore.get();
@@ -197,6 +250,8 @@ function initBurger() {
   });
 }
 
+
+
 /* ========= История ========= */
 import MangadexService from "./mangadex.service.js";
 
@@ -299,5 +354,5 @@ async function loadHistory() {
 
   setupGuards(isGuest);
 
-  if (!isGuest) loadHistory();
+  if (!isGuest) loadHomeHistory();
 })();

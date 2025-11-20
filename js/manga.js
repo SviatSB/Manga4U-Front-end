@@ -10,31 +10,6 @@ const id = qs('id');
 const content = document.getElementById('content');
 
 /* =========================================================
-   👍 Сохранение истории при заходе на страницу манги
-   ========================================================= */
-async function saveMangaOpen(mangaData) {
-  try {
-    const dto = {
-      mangaExternalId: mangaData.id,
-      lastChapterId: "manga",  // <<< ВАЖНО: НЕ пустая строка
-      lastChapterTitle: "Перегляд манґи",
-      lastChapterNumber: 0,
-      language: "info"
-    };
-
-    await apiFetch("/api/history", {
-      method: "POST",
-      body: JSON.stringify(dto),
-    });
-
-  } catch (e) {
-    console.warn("Не удалось сохранить историю о манге:", e);
-  }
-}
-
-
-
-/* =========================================================
    👍 Сохранение перед переходом к чтению главы
    ========================================================= */
 async function saveHistory(chapter, lang) {
@@ -68,7 +43,7 @@ async function load() {
     const data = res?.data || res;
 
     /* 👇 Сохраняем просмотр манги */
-    await saveMangaOpen(data);
+    // await saveMangaOpen(data);
 
     const attr = data?.attributes || {};
     const title =

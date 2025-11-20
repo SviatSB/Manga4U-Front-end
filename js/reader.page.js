@@ -15,6 +15,18 @@ const useSaver = document.getElementById("useSaver");
 const reloadBtn = document.getElementById("reload");
 const openBase = document.getElementById("openBase");
 
+
+const openMangaPage = document.getElementById("openMangaPage");
+let mangaIdGlobal = null;
+
+function bindMangaButton() {
+  if (mangaIdGlobal) {
+    openMangaPage.href = `/manga.html?id=${mangaIdGlobal}`;
+    openMangaPage.style.display = "inline-block";
+  }
+}
+
+
 /* =========================================================
    👍 Сохранение истории (просмотр главы)
    ========================================================= */
@@ -26,28 +38,31 @@ async function saveHistory(chapter) {
     const mangaId = mangaRel.id;
     const attrs = chapter.attributes || {};
 
-    const number = parseInt(attrs.chapter || "0");
-    const safeTitle =
-      attrs.title && attrs.title.trim().length > 0
-        ? attrs.title
-        : `Chapter ${number || "?"}`;
+    let number = parseInt(attrs.chapter || "0");
+    if (!number || number < 1) number = 1;   // FIX: глава 0 → глава 1
+
+    const title = attrs.title && attrs.title.trim().length > 0
+      ? attrs.title
+      : `Chapter ${number}`;
 
     const dto = {
       mangaExternalId: mangaId,
       lastChapterId: chapterId,
       language: attrs.translatedLanguage || "unknown",
-      lastChapterTitle: safeTitle,   // <<< ИСПРАВЛЕНО
-      lastChapterNumber: number,
+      lastChapterTitle: title,
+      lastChapterNumber: number     // ← теперь всегда >= 1
     };
 
     await apiFetch("/api/history", {
       method: "POST",
-      body: JSON.stringify(dto),
+      body: JSON.stringify(dto)
     });
   } catch (e) {
     console.warn("Не удалось сохранить историю:", e);
   }
 }
+
+
 
 
 /* =========================================================
@@ -64,6 +79,12 @@ async function loadPages() {
   try {
     const chapterInfo = await MangadexService.callProxy(`/chapter/${chapterId}`);
     const chapter = chapterInfo?.data || chapterInfo;
+
+    // после получения chapter
+    const mangaRel = chapter?.relationships?.find(r => r.type === "manga");
+    mangaIdGlobal = mangaRel?.id || null;
+    bindMangaButton();
+
 
     // 👇 Сохраняем историю (только авторизованным)
     if (chapter) await saveHistory(chapter);

@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html lang="uk">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Manga4U — Головна</title>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manga4U — Історія</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+  <link rel="stylesheet" href="./css/history.css">
+  <link rel="stylesheet" href="./css/main.css" />
+</head>
 
-    <link rel="stylesheet" href="./css/main.css" />
-  </head>
-  <body class="page">
-    <header class="header">
+<body>
+  <header class="header">
       <div class="header__bar">
         <a class="logo" href="./index.html">
           <span class="logo__badge">M4U</span>
@@ -144,40 +139,8 @@
       </div>
     </header>
 
-    <!-- Mobile off-canvas -->
-    <aside id="mobileMenu" class="mobileMenu" aria-hidden="true">
-      <nav class="mobileMenu__nav">
-        <a class="mobileMenu__link" href="./index.html">Головна</a>
-        <a class="mobileMenu__link" href="./search.html">Пошук</a>
-        <a class="mobileMenu__link guard-required" href="./favorites.html" data-guard="favorites"
-          >Улюблені</a
-        >
-        <a
-          class="mobileMenu__link guard-required"
-          href="./collections.html"
-          data-guard="collections"
-          >Колекції</a
-        >
-        <a
-          class="mobileMenu__link"
-          href="./profile.html"
-          data-auth-only
-          hidden
-          id="mobileProfileLink"
-          >Кабінет</a
-        >
-        <a class="mobileMenu__link mobileMenu__link--admin" href="./admin-users.html" hidden
-          >Панель адміністратора</a
-        >
-        <a class="mobileMenu__link" href="./auth.html?next=./index.html" id="mobileLoginLink"
-          >Увійти</a
-        >
-        <button class="mobileMenu__link" id="mobileLogoutBtn" type="button" hidden>Вийти</button>
-      </nav>
-    </aside>
-    <div class="mobileMenu__backdrop" hidden></div>
 
-    <!-- BG handwriting (single) -->
+  <!-- BG handwriting (single) -->
     <svg
       class="bg-script"
       viewBox="0 0 1600 900"
@@ -196,47 +159,14 @@
         </filter>
       </defs>
       <text x="50%" y="55%" text-anchor="middle" class="bg-script__text">Manga4U</text>
-    </svg>
+    </svg>  
 
-    <main class="main">
-      <section class="section">
-        <div class="section__header">
-          <h2 class="section__title">Зараз читають</h2>
-        </div>
+  <main class="history">
+    <div id="historyList" class="history__list"></div>
+    <div id="errorMessage" class="history__error"></div>
+  </main>
 
-        <div class="board">
-          <article class="panel">
-            <div class="panel__head">
-              <h3 class="panel__title">Новинки</h3>
-              <a class="panel__more" href="./mangadex-new.html">→</a>
-            </div>
-            <div class="grid grid--tight" id="newGrid" data-fill="4"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel__head">
-              <h3 class="panel__title">Популярні</h3>
-              <a class="panel__more" href="./mangadex-popular.html">→</a>
-            </div>
-            <div class="grid grid--tight" id="popularGrid" data-fill="4"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel__head">
-              <h3 class="panel__title">Історія</h3>
-              <a class="panel__more" href="./history.html">→</a>
-            </div>
-            <div class="grid grid--genres" id="genresGrid" data-fill="4"></div>
-          </article>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <p>© 2025 Manga4U</p>
-    </footer>
-
-  <script type="module" src="/js/home-latest.js"></script>
+  <script type="module" src="/js/history.js"></script>
   <script type="module" src="/js/main.js"></script>
-  </body>
+</body>
 </html>

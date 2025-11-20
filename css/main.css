@@ -429,6 +429,49 @@ body.menu-open {
   animation: drawText 6s ease-in-out infinite;
 }
 
+/* === HISTORY CARDS ON HOME === */
+
+.grid--genres .panel__item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.25s ease;
+  backdrop-filter: blur(6px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover эффект */
+.grid--genres .panel__item:hover {
+  background: rgba(140, 82, 255, 0.18);
+  border-color: rgba(140, 82, 255, 0.5);
+  transform: translateY(-3px);
+}
+
+/* Название манги */
+.grid--genres .panel__item .history-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
+/* Номер и название главы */
+.grid--genres .panel__item .history-subtitle {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+/* Мелкий текст */
+.grid--genres .panel__item .history-small {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+
 @keyframes drawText {
   0% {
     stroke-dashoffset: var(--dash, 1000);

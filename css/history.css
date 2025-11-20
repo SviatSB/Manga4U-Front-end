@@ -1,0 +1,93 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  color: #eaeaff;
+}
+
+body, html {
+  height: 100%;
+}
+
+.history-header {
+  padding: 40px 20px 10px;
+  text-align: center;
+}
+
+.history-header__title {
+  margin: 0;
+  font-size: 38px;
+  font-weight: 700;
+  color: #c9b9ff;
+}
+
+.history-header__subtitle {
+  margin-top: 8px;
+  font-size: 16px;
+  opacity: 0.7;
+}
+
+.history {
+  width: 100%;
+  max-width: 900px;
+  min-height: calc(100vh - 150px);
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.history__error {
+  margin-top: 20px;
+  color: #ff6e6e;
+  text-align: center;
+  display: none;
+}
+
+.history__list {
+  display: grid;
+  gap: 16px;
+}
+
+.history-card {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 20px;
+  border-radius: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: 0.3s;
+}
+
+.history-card:hover {
+  background: rgba(255, 255, 255, 0.13);
+}
+
+.history-card__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-card__title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.history-card__desc {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.history-card__btn {
+  padding: 10px 20px;
+  background: #9b59ff;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.history-card__btn:hover {
+  background: #b77aff;
+}

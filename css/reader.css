@@ -118,6 +118,24 @@ svg{
 }
 
 
+.reader-back-btn {
+  display: inline-block;
+  margin-bottom: 15px;
+  padding: 10px 18px;
+  background: #7b2dfb;
+  color: white;
+  border-radius: 12px;
+  font-size: 15px;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.reader-back-btn:hover {
+  opacity: .8;
+}
+
+
+
 /* Центруем страницы на больших экранах */
 @media (min-width: 900px) {
   .pages {
