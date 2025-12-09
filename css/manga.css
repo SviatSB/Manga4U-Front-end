@@ -272,6 +272,44 @@ h3 {
   box-shadow: 0 0 20px rgba(150, 110, 230, 0.9);
 }
 
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal__content {
+    background: #1b1b2f;
+    padding: 20px;
+    border-radius: 12px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+} 
+
+.collection-item {
+    padding: 10px;
+    margin: 8px 0;
+    background: #23233a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.collection-item:hover {
+    background: #30304f;
+}
+
+
 
 /* Адаптив под узкие экраны */
 @media (max-width: 720px) {
@@ -348,5 +386,139 @@ h3 {
 
   .desc {
     font-size: 12px;
+  }
+}
+
+
+/* ========= Модалка "Додати в колекцію" ========= */
+
+#collectionModal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(3, 3, 8, 0.82);
+  backdrop-filter: blur(6px);
+
+  z-index: 1000;
+}
+
+#collectionModal.hidden {
+  display: none;
+}
+
+#collectionModal .modal__content {
+  width: min(440px, 92vw);
+  padding: 28px 26px 24px;
+
+  background: radial-gradient(circle at top, #2a174b 0, #14141b 55%, #0c0c12 100%);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+
+  color: #f7f4ff;
+  text-align: center;
+}
+
+/* Заголовок "Додати в колекцію" */
+#collectionModal h2 {
+  margin: 0 0 6px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Заголовки "Системні" / "Мої колекції" внутри списка */
+#collectionList > h3 {
+  margin: 18px 0 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+/* Контейнер с кнопками-колекциями */
+#collectionList {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* сами кнопки коллекций (любые кнопки внутри списка) */
+#collectionList button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 16px;
+  margin: 3px 4px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(20, 20, 30, 0.9);
+  color: #f7f4ff;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
+}
+
+#collectionList button:hover {
+  background: #6c4bff;
+  border-color: #bba2ff;
+  box-shadow: 0 0 12px rgba(124, 83, 255, 0.7);
+  transform: translateY(-1px);
+}
+
+/* Кнопка "Закрити" */
+#closeModal {
+  margin-top: 22px;
+  padding: 10px 22px;
+
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #7b47ff, #c76bff);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    filter 0.12s ease;
+}
+
+#closeModal:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.7);
+}
+
+#closeModal:active {
+  transform: translateY(1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.65);
+}
+
+/* Адаптив: на совсем маленьких экранах чуть уменьшаем шрифты */
+@media (max-width: 480px) {
+  #collectionModal .modal__content {
+    padding: 22px 18px 18px;
+    border-radius: 22px;
+  }
+
+  #collectionModal h2 {
+    font-size: 1.5rem;
+  }
+
+  #collectionList button {
+    font-size: 0.85rem;
+    padding-inline: 12px;
   }
 }

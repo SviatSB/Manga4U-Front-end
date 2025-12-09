@@ -1,21 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="uk">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Manga4U — Головна</title>
+<head>
+    <meta charset="utf-8">
+    <title>Колекції</title>
+    <link rel="stylesheet" href="/css/collections.css">
+    <link rel="stylesheet" href="/css/main.css">
+</head>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+<body class="page">
 
-    <link rel="stylesheet" href="./css/main.css" />
-  </head>
-  <body class="page">
-    <header class="header">
+<!-- BG handwriting (single) -->
+  <svg
+      class="bg-script"
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+      focusable="false"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <filter id="soft-glow">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <text x="50%" y="55%" text-anchor="middle" class="bg-script__text">Manga4U</text>
+  </svg>
+
+  <header class="header">
       <div class="header__bar">
         <a class="logo" href="./index.html">
           <span class="logo__badge">M4U</span>
@@ -142,110 +157,36 @@
           <span class="burger__line"></span>
         </button>
       </div>
-    </header>
+  </header>
 
-    <!-- Mobile off-canvas -->
-    <aside id="mobileMenu" class="mobileMenu" aria-hidden="true">
-      <nav class="mobileMenu__nav">
-        <a class="mobileMenu__link" href="./index.html">Головна</a>
-        <a class="mobileMenu__link" href="./search.html">Пошук</a>
-        <a class="mobileMenu__link guard-required" href="./favorites.html" data-guard="favorites"
-          >Улюблені</a
-        >
-        <a
-          class="mobileMenu__link guard-required"
-          href="./collections.html"
-          data-guard="collections"
-          >Колекції</a
-        >
-        <a
-          class="mobileMenu__link"
-          href="./profile.html"
-          data-auth-only
-          hidden
-          id="mobileProfileLink"
-          >Кабінет</a
-        >
-        <a class="mobileMenu__link mobileMenu__link--admin" href="./admin-users.html" hidden
-          >Панель адміністратора</a
-        >
-        <a class="mobileMenu__link" href="./auth.html?next=./index.html" id="mobileLoginLink"
-          >Увійти</a
-        >
-        <button class="mobileMenu__link" id="mobileLogoutBtn" type="button" hidden>Вийти</button>
-      </nav>
-    </aside>
-    <div class="mobileMenu__backdrop" hidden></div>
+<main class="collections-container main">
 
-    <!-- BG handwriting (single) -->
-    <svg
-      class="bg-script"
-      viewBox="0 0 1600 900"
-      preserveAspectRatio="xMidYMid slice"
-      aria-hidden="true"
-      focusable="false"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <defs>
-        <filter id="soft-glow">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <text x="50%" y="55%" text-anchor="middle" class="bg-script__text">Manga4U</text>
-    </svg>
+    <h1 class="page-title">Ваші колекції</h1>
 
-    <main class="main">
-      <section class="section">
-        <div class="section__header">
-          <h2 class="section__title">Зараз читають</h2>
-        </div>
+    <section class="collections-section">
+        <h2>Системні колекції</h2>
+        <div id="systemCollections" class="collections-grid"></div>
+    </section>
 
-        <div class="board">
-          <article class="panel">
-            <div class="panel__head">
-              <h3 class="panel__title">Новинки</h3>
-              <a class="panel__more" href="./mangadex-new.html">→</a>
-            </div>
-            <div class="grid grid--tight" id="newGrid" data-fill="4"></div>
-          </article>
+    <section class="collections-section">
+        <h2>Особисті колекції</h2>
 
-          <article class="panel">
-            <div class="panel__head">
-              <h3 class="panel__title">Популярні</h3>
-              <a class="panel__more" href="./mangadex-popular.html">→</a>
-            </div>
-            <div class="grid grid--tight" id="popularGrid" data-fill="4"></div>
-          </article>
+        <button id="createCollectionBtn" class="btn-primary new-collection-btn action-btn">
+            ➕ Нова колекція
+        </button>
 
-          <article class="panel">
-            <div class="panel__head">
-              <h3 class="panel__title">Історія</h3>
-              <a class="panel__more" href="./history.html">→</a>
-            </div>
-            <div class="grid grid--genres" id="genresGrid" data-fill="4"></div>
-          </article>
-        </div>
-        <!-- === РЕКОМЕНДАЦІЇ (ширина = 3 колонки) === -->
-        <article class="panel panel--wide">
-          <div class="panel__head">
-            <h3 class="panel__title">Рекомендації</h3>
-            <a class="panel__more" href="./recommendations.html">→</a>
-          </div>
+        <div id="userCollections" class="collections-grid"></div>
+    </section>
 
-          <div id="frontRecoGrid" class="grid grid--reco"></div>
-        </article>
-      </section>
-    </main>
+    <section class="collections-section">
+        <h2>Пошук публічних колекцій</h2>
+        <a class="search-public-link" href="collections-search.html">👉 Перейти до пошуку</a>
+    </section>
 
-    <footer class="footer">
-      <p>© 2025 Manga4U</p>
-    </footer>
+</main>
 
-  <script type="module" src="/js/home-latest.js"></script>
+  <script type="module" src="/js/collections.page.js"></script>
   <script type="module" src="/js/main.js"></script>
-  </body>
+
+</body>
 </html>

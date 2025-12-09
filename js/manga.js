@@ -253,6 +253,16 @@ async function load() {
         });
       });
     }
+ 
+    window.__mangaData = {
+      externalId: id,
+      title,
+      description: desc,
+      coverUrl,
+      status: statusText,
+      year
+    };
+
 
     content.innerHTML = `
       <div class="layout">
@@ -261,6 +271,9 @@ async function load() {
         </div>
         <div class="layout__main">
           <h1>${title}</h1>
+          <button id="addToCollectionBtn" class="btn btn-accent" style="margin-bottom: 10px;">
+            + Додати в колекцію
+          </button>
           <div class="meta">
             ${alt}
             ${year ? ' · ' + year : ''}

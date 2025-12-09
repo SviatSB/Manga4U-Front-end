@@ -85,7 +85,7 @@ async function loadHomeHistory() {
       return;
     }
 
-    // последние 4 записи
+    // последние 8 записей
     const recent = res
       .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
       .slice(0, 8);
@@ -113,7 +113,6 @@ async function loadHomeHistory() {
         <div class="history-small">${chapterTitle}</div>
       `;
 
-
       div.onclick = () => {
         location.href = `/reader.html?chapterId=${chapterId}`;
       };
@@ -124,7 +123,6 @@ async function loadHomeHistory() {
     console.error("Помилка завантаження історії на головній:", err);
   }
 }
-
 
 /* ========= Авторизация ========= */
 async function getCurrentUser() {
@@ -250,8 +248,6 @@ function initBurger() {
   });
 }
 
-
-
 /* ========= История ========= */
 import MangadexService from "./mangadex.service.js";
 
@@ -319,6 +315,90 @@ async function loadHistory() {
   }
 }
 
+/* ========= Рекомендації на головній ========= */
+async function loadFrontRecommendations() {
+  const grid = document.getElementById("frontRecoGrid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+
+  try {
+    // 1) Жанровий вектор
+    const raw = await apiFetch("/api/history/recomendation-vector?limit=20");
+    const items = Array.isArray(raw) ? raw : raw?.items || [];
+
+    if (!items.length) {
+      grid.innerHTML = `<div style="padding:12px;opacity:.6">Немає рекомендацій</div>`;
+      return;
+    }
+
+    // 2) Топ-2 жанри
+    const topGenres = items
+      .filter((g) => g.genreId)
+      .sort((a, b) => b.number - a.number)
+      .slice(0, 2)
+      .map((g) => g.genreId);
+
+    // 3) Запит до Mangadex
+    const params = {
+      "includedTags[]": topGenres,
+      includedTagsMode: "OR",
+      "contentRating[]": ["safe", "suggestive"],
+      limit: 10,
+      "order[relevance]": "desc",
+    };
+
+    const mdRes = await MangadexService.callProxy("/manga", params, {
+      method: "GET",
+    });
+    const mdItems = mdRes?.data || [];
+
+    if (!mdItems.length) {
+      grid.innerHTML = `<div style="padding:12px;opacity:.6">Не знайдено манґ</div>`;
+      return;
+    }
+
+    // 4) Рендер
+    for (const item of mdItems) {
+      const id = item.id;
+      const a = item.attributes || {};
+      const title =
+        a.title?.uk ||
+        a.title?.en ||
+        Object.values(a.title || {})[0] ||
+        "Без назви";
+
+      let cover = "/css/placeholder.png";
+
+      const rel = (item.relationships || []).find(
+        (r) => r.type === "cover_art"
+      );
+      if (rel?.id) {
+        try {
+          const c = await MangadexService.callProxy(`/cover/${rel.id}`);
+          const file = c?.data?.attributes?.fileName;
+          if (file)
+            cover = `https://uploads.mangadex.org/covers/${id}/${file}`;
+        } catch {}
+      }
+
+      const card = document.createElement("a");
+      card.href = `/manga.html?id=${id}`;
+      card.className = "card";
+
+      card.innerHTML = `
+        <div class="card__stub" style="background-image:url('${cover}')"></div>
+        <div class="card__title">${title}</div>
+      `;
+
+      grid.appendChild(card);
+    }
+  } catch (err) {
+    console.error("Front recommendations error:", err);
+    grid.innerHTML = `<div style="padding:12px;opacity:.6">Помилка завантаження</div>`;
+  }
+}
+
 /* ========= INIT ========= */
 (async function bootstrap() {
   initBurger();
@@ -354,5 +434,8 @@ async function loadHistory() {
 
   setupGuards(isGuest);
 
-  if (!isGuest) loadHomeHistory();
+  if (!isGuest) {
+    loadHomeHistory();
+    loadFrontRecommendations();
+  }
 })();

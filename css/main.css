@@ -519,6 +519,60 @@ body.menu-open {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
+/* Панель рекомендацій — на всю ширину */
+.panel--wide {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* Сетка рекомендацій (3 столбца, 2 строки) */
+.grid--reco {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+
+  justify-items: center;     /* центрует карточки в колонках */
+    align-items: start;
+
+    justify-content: center;   /* центрирует весь grid внутри контейнера */
+}
+
+/* Карточки только в рекомендациях — уменьшенная высота */
+.panel--wide .card {
+    height: 280px;        /* было около 320–360 */
+    max-height: 280px;
+}
+
+/* Пропорция изображения — компактнее */
+.panel--wide .card .thumb {
+    height: 220px;        /* уменьшили обложку */
+    object-fit: cover;
+}
+
+/* Уменьшаем размер шрифтов */
+.panel--wide .card .title {
+    font-size: 0.85rem;
+}
+
+.panel--wide .card .subtitle,
+.panel--wide .card .desc {
+    font-size: 0.75rem;
+}
+
+
+/* Адаптив */
+@media (max-width: 1100px) {
+    .grid--reco {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .grid--reco {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+}
 
 /* ===== Adaptive ===== */
 @media (max-width: 992px) {
@@ -535,6 +589,7 @@ body.menu-open {
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
 @media (max-width: 768px) {
   .nav {
     display: none;
@@ -556,6 +611,7 @@ body.menu-open {
     font-size: 22px;
   }
 }
+
 @media (max-width: 520px) {
   .grid--genres {
     grid-template-columns: repeat(2, 1fr);

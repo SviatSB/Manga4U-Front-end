@@ -1,0 +1,271 @@
+
+
+/* Основная сетка */
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 22px;
+    margin-top: 20px;
+}
+
+/* Карточка */
+.collection-item {
+    background: #141414;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 22px;
+    padding: 26px 24px;
+    transition: 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Подсветка */
+.collection-item:hover {
+    box-shadow: 0 0 18px rgba(150, 80, 255, 0.55);
+    transform: translateY(-4px);
+    border-color: rgba(150, 80, 255, 0.7);
+}
+
+/* Заголовок */
+.collection-title {
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+/* Количество манг */
+.collection-count {
+    font-size: 18px;
+    text-align: center;
+    opacity: 0.8;
+    margin-bottom: 24px;
+}
+
+/* Нижняя панель кнопок */
+.collection-actions {
+    display: flex;
+    flex-wrap: wrap;        /* <-- разрешаем перенос кнопок */
+    justify-content: center;
+    gap: 10px;              /* расстояние между кнопками */
+}
+
+
+/* Кнопки */
+.action-btn {
+    flex: 1 1 90px;      /* минимальная ширина, можно менять */
+    max-width: 160px;       /* чтобы кнопки не были слишком широкими */
+    padding: 10px 14px;
+    margin: 0 6px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 10px;
+    background: transparent;
+    color: #fff;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Hover кнопок */
+.action-btn:hover {
+    background: rgba(150, 80, 255, 0.25);
+    border-color: rgba(150, 80, 255, 0.7);
+}
+
+/* Для системных коллекций — без панели кнопок */
+.collection-item.system {
+    cursor: pointer;
+}
+
+.btn-primary.new-collection-btn {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.search-public-link {
+    font-size: 18px;
+    color: #b785ff;
+    text-decoration: none;
+}
+.search-public-link:hover {
+    text-decoration: underline;
+}
+
+
+/* ============ АДАПТИВ ============ */
+
+/* Планшеты */
+@media (max-width: 900px) {
+    .collections-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 18px;
+    }
+
+    .collection-item {
+        padding: 22px;
+    }
+
+    .collection-title {
+        font-size: 22px;
+    }
+}
+
+/* Мобильные */
+@media (max-width: 600px) {
+    .collections-grid {
+        grid-template-columns: 1fr; /* одна карточка */
+        gap: 18px;
+    }
+
+    .collection-item {
+        padding: 20px 18px;
+        border-radius: 18px;
+    }
+
+    .collection-actions {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .action-btn {
+        width: 100%;
+        margin: 0;
+        padding: 12px;
+        font-size: 16px;
+    }
+}
+
+/* Очень маленькие экраны */
+@media (max-width: 400px) {
+    .collection-title {
+        font-size: 20px;
+    }
+
+    .collection-count {
+        font-size: 16px;
+    }
+
+    .action-btn {
+        font-size: 15px;
+        padding: 10px;
+    }
+}
+
+
+/* ===== Страница поиска коллекций ===== */
+
+.search-page {
+    padding-top: 40px;
+}
+
+.search-container {
+    width: min(1100px, 90%);
+    margin-inline: auto;
+}
+
+.search-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.search-subtitle {
+    margin-top: 8px;
+    font-size: 0.95rem;
+    color: #a6a6b3;
+}
+
+/* инпут поиска */
+.search-input {
+    min-width: 260px;
+    flex: 0 0 320px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(10, 10, 15, 0.9);
+    color: #fff;
+    outline: none;
+    font-size: 0.95rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.search-input::placeholder {
+    color: #72727f;
+}
+
+.search-input:focus {
+    border-color: rgba(150, 80, 255, 0.8);
+    box-shadow: 0 0 0 1px rgba(150, 80, 255, 0.7);
+    background: #15151d;
+}
+
+/* сетка результатов использует .collections-grid */
+
+/* карточка в поиске */
+.search-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px 18px;
+}
+
+/* тело карточки */
+.search-card__body {
+    margin-bottom: 16px;
+}
+
+/* низ карточки: кнопки */
+.search-card__actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}
+
+/* кнопки */
+.btn-primary,
+.btn-secondary {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #7b4bff, #b688ff);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 0 10px rgba(150, 80, 255, 0.6);
+}
+
+.btn-secondary {
+    background: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #f5f5ff;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* пустое состояние */
+.search-results .empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #a6a6b3;
+    margin-top: 10px;
+}

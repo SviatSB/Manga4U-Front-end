@@ -1,0 +1,63 @@
+/* recommendations.css */
+
+.panel--recommendations {
+  margin-top: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel--recommendations .controls__limit input#limitInput {
+  width: 70px;
+}
+
+
+/* --- СТИЛИ КНОПКИ "Оновити рекомендації" --- */
+.reco-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    transition: 0.25s ease;
+}
+
+.reco-btn:hover {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.reco-btn:active {
+    transform: translateY(1px);
+}
+
+
+/* --- СТИЛИ ПОЛЯ ЛИМИТА --- */
+.reco-limit-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.7);
+}
+
+.reco-limit-input {
+    width: 72px;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.reco-limit-input:focus {
+    border-color: #9b6bff;
+    box-shadow: 0 0 0 3px rgba(155, 107, 255, 0.25);
+}
