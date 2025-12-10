@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manga4U — Пошук</title>
+
+  <script type="module" crossorigin src="/assets/mangadex-search-DRVyDyoj.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/api.client-Cwoejsn1.js">
+  <link rel="modulepreload" crossorigin href="/assets/main-FYAW3UC_.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-DMiu_RKH.css">
+  <link rel="stylesheet" crossorigin href="/assets/mangadex-search-BtsUjjsS.css">
+</head>
+
+<body>
+  <header class="header">
+    <div class="header__bar">
+      <a class="logo" href="./index.html">
+        <span class="logo__badge">M4U</span>
+        <span class="logo__word">Manga4U</span>
+      </a>
+
+      <nav class="nav" aria-label="Основна навігація">
+        <a class="navbtn" href="./mangadex-search.html">
+          <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M16.5 16.5L21 21"
+                  fill="none" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round"/>
+          </svg>
+          <span class="navbtn__tx">Пошук</span>
+        </a>
+
+        <a class="navbtn guard-required" href="./favorites.html" data-guard="favorites">
+          <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 20s-7.5-4.7-9.2-8.4C1.7 9.1 3.1 6.5 6 6.2c1.7-.2 3.2.7 4 2 0 0 .8-2.1 3.7-2
+                     2.9.1 4.7 2.8 3.5 5.4C15.7 16 12 20 12 20z"
+                  fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linejoin="round"/>
+          </svg>
+          <span class="navbtn__tx">Улюблені</span>
+        </a>
+
+        <a class="navbtn guard-required" href="./collections.html" data-guard="collections">
+          <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"
+                  fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linejoin="round"/>
+            <path d="M12 12l8-4.5M12 12l-8-4.5M12 12v9"
+                  fill="none" stroke="currentColor" stroke-width="1.2"
+                  stroke-linejoin="round"/>
+          </svg>
+          <span class="navbtn__tx">Колекції</span>
+        </a>
+
+        <!-- Гість → Увійти -->
+        <a id="loginLink" class="navbtn navbtn--accent"
+           href="./auth.html?next=./index.html"
+           hidden>
+          <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M10 7h8v10h-8M13 12H3"
+                  fill="none" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="navbtn__tx">Увійти</span>
+        </a>
+
+        <div class="profile" id="profileBlock" hidden>
+          <button class="navbtn profile__btn" id="profileBtn"
+                  aria-expanded="false" aria-controls="profileMenu">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"
+                    fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round"/>
+            </svg>
+            <span class="navbtn__tx"><span id="profileName">Кабінет</span></span>
+            <span id="roleBadge" class="role-badge" hidden></span>
+          </button>
+
+          <div class="profile__menu" id="profileMenu" hidden>
+            <a href="./profile.html" class="profile__item">Редагувати профіль</a>
+            <a href="./admin-users.html" class="profile__item profile__item--admin" hidden>
+              Панель адміністратора
+            </a>
+            <hr class="profile__sep" />
+            <button class="profile__item" id="logoutBtn" type="button">Вийти</button>
+          </div>
+        </div>
+      </nav>
+
+      <button class="burger" aria-label="Меню"
+              aria-controls="mobileMenu" aria-expanded="false">
+        <span class="burger__line"></span>
+      </button>
+    </div>
+  </header>
+
+
+  <svg class="bg-script" viewBox="0 0 1600 900"
+       preserveAspectRatio="xMidYMid slice"
+       aria-hidden="true" focusable="false">
+    <text x="50%" y="55%" text-anchor="middle"
+          class="bg-script__text">Manga4U</text>
+  </svg>
+
+
+  <main class="main">
+    <h1>Пошук</h1>
+
+    <div class="controls">
+
+      <label class="controls__field">
+        Назва
+        <input id="title" placeholder="Введіть назву" />
+      </label>
+
+      <label class="controls__field controls__field--genres">
+        Жанри
+        <div class="controls__genresWrapper">
+          <input id="genreFilter" class="controls__genreFilter"
+                 placeholder="Фільтр жанрів..." />
+          <div id="genres" class="controls__genresList"></div>
+        </div>
+      </label>
+
+      <div class="controls__side">
+        <div class="controls__buttons">
+          <button id="searchBtn" class="btn">Пошук</button>
+          <button id="refreshTagsBtn" class="btn"
+                  title="Оновити кеш жанрів">
+            Оновити жанри
+          </button>
+        </div>
+
+        <div class="controls__pager">
+          <button id="prev" class="btn">‹ Попередня</button>
+          <div>Сторінка <strong id="pageDisplay">1</strong></div>
+          <button id="next" class="btn">Наступна ›</button>
+        </div>
+
+        <label class="controls__limit">
+          Ліміт
+          <input id="limitInput" value="20" />
+        </label>
+      </div>
+
+    </div>
+
+
+    <div class="panel panel--searchStatus">
+      <div id="status">Завантаження жанрів...</div>
+      <div id="tagMap" class="tagMap"></div>
+    </div>
+
+    <div id="grid" class="grid" aria-live="polite"></div>
+
+  </main>
+
+
+</body>
+</html>

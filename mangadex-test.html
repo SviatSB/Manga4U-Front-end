@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mangadex Service Test</title>
+  <style>
+    /* Light theme and compact layout */
+    body { padding: 20px; font-family: system-ui,Segoe UI,Roboto,Arial; background: #fff; color: #111 }
+    .controls { display:flex; gap:12px; margin-bottom:14px; align-items:flex-start }
+    input, textarea { padding:8px; font-size:14px; border:1px solid #ddd; border-radius:4px }
+    label { display:block; font-size:13px; color:#222 }
+    pre { background:#f6f6f6; color:#111; padding:12px; max-height:60vh; overflow:auto; border:1px solid #eee }
+    .btn { padding:8px 12px; cursor:pointer; border:1px solid #bbb; background:#fafafa; border-radius:6px }
+    .panel { background: #fff; border:1px solid #eee; padding:12px; border-radius:6px }
+  </style>
+  <script type="module" crossorigin src="/assets/mangadex-test-BByy7NXx.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-DMiu_RKH.css">
+</head>
+<body>
+  <header class="panel" style="display:flex; align-items:center; gap:10px; margin-bottom:14px">
+    <nav aria-label="Main">
+      <a class="btn" href="/mangadex-test.html">Tester</a>
+      <a class="btn" href="/mangadex-search.html">Search</a>
+      <a class="btn" href="/mangadex-new.html">New</a>
+      <a class="btn" href="/mangadex-popular.html">Popular</a>
+    </nav>
+  </header>
+
+  <h1>Mangadex Proxy Tester</h1>
+
+  <div class="controls">
+    <div style="display:flex; flex-direction:column; gap:10px; min-width:360px">
+      <label>Proxy path
+        <input id="path" placeholder="/manga/tag or /manga?title=one" style="width:100%" />
+      </label>
+
+      <label>Headers (JSON, optional)
+        <textarea id="headers" placeholder='{"X-Custom":"value"}' style="height:90px; width:100%"></textarea>
+      </label>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; flex:1; justify-content:flex-start">
+      <div style="display:flex; gap:8px">
+        <button id="send" class="btn">Send GET</button>
+        <button id="exampleTags" class="btn">/manga/tag</button>
+        <button id="exampleSearch" class="btn">/manga?title=one</button>
+      </div>
+
+      <div style="color:#666; font-size:13px">Note: this tester only performs GET requests (proxy path is appended to /api/mangadexproxy).</div>
+    </div>
+  </div>
+
+  <div style="margin-top:12px; display:flex; gap:12px">
+    <div style="flex:1">
+      <strong>Response</strong>
+      <div id="respSummary" style="margin:6px 0; color:#333">(no request yet)</div>
+      <pre id="resp" style="white-space:pre-wrap; word-break:break-word;">(response will appear here)</pre>
+    </div>
+
+    <div style="width:320px">
+      <strong>Debug</strong>
+      <div style="font-size:13px; color:#444; margin-top:6px">Request URL (sent):</div>
+      <div id="sentUrl" style="font-family:monospace; font-size:13px; color:#111; background:#f6f6f6; padding:8px; margin-top:6px; white-space:pre-wrap;">-</div>
+    </div>
+  </div>
+
+</body>
+</html>

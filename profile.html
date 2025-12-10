@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Manga4U — Редагування профілю</title>
+
+    <!-- шрифты и стили общего сайта -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- стили страницы профиля -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%231b1722'/%3E%3Ctext x='32' y='40' text-anchor='middle' font-size='28' fill='%238b6dd8' font-family='Segoe UI,Arial'%3EM%3C/text%3E%3C/svg%3E"
+    />
+    <script type="module" crossorigin src="/assets/profile-Bwpmf7sh.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/assets/main-FYAW3UC_.js">
+    <link rel="stylesheet" crossorigin href="/assets/profile-phneBXag.css">
+    <link rel="stylesheet" crossorigin href="/assets/main-DMiu_RKH.css">
+  </head>
+  <body class="page">
+    <!-- Header -->
+    <header class="header">
+      <div class="header__bar">
+        <a class="logo" href="./index.html">
+          <span class="logo__badge">M4U</span>
+          <span class="logo__word">Manga4U</span>
+        </a>
+
+        <nav class="nav">
+          <a class="navbtn" href="./index.html">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <circle
+                cx="11"
+                cy="11"
+                r="6.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path
+                d="M16.5 16.5L21 21"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Головна</span>
+          </a>
+          <a class="navbtn" href="./search.html">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <circle
+                cx="11"
+                cy="11"
+                r="6.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+              />
+              <path
+                d="M16.5 16.5L21 21"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Пошук</span>
+          </a>
+          <a class="navbtn guard-required" href="./favorites.html" data-guard="favorites">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 20s-7.5-4.7-9.2-8.4C1.7 9.1 3.1 6.5 6 6.2c1.7-.2 3.2.7 4 2 0 0 .8-2.1 3.7-2 2.9.1 4.7 2.8 3.5 5.4C15.7 16 12 20 12 20z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Улюблені</span>
+          </a>
+          <a class="navbtn guard-required" href="./collections.html" data-guard="collections">
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M12 12l8-4.5M12 12l-8-4.5M12 12v9"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.2"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Колекції</span>
+          </a>
+
+          <div class="profile" id="profileBlock" hidden>
+            <button
+              class="navbtn profile__btn"
+              id="profileBtn"
+              aria-expanded="false"
+              aria-controls="profileMenu"
+            >
+              <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                />
+                <path
+                  d="M5 19c1.5-3 4-4.5 7-4.5S17.5 16 19 19"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span class="navbtn__tx"><span id="profileName">Кабінет</span></span>
+              <span id="roleBadge" class="role-badge" hidden></span>
+            </button>
+            <div class="profile__menu" id="profileMenu" hidden>
+              <a href="./profile.html" class="profile__item">Редагувати профіль</a>
+              <a href="./admin-users.html" class="profile__item profile__item--admin" hidden
+                >Панель адміністратора</a
+              >
+              <hr class="profile__sep" />
+              <button class="profile__item" id="logoutBtn" type="button">Вийти</button>
+            </div>
+          </div>
+
+          <a
+            id="loginLink"
+            class="navbtn navbtn--accent"
+            href="./auth.html?next=./profile.html"
+            hidden
+          >
+            <svg class="navbtn__ic" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M10 7h8v10h-8M13 12H3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="navbtn__tx">Увійти</span>
+          </a>
+        </nav>
+
+        <button class="burger" aria-label="Меню" aria-controls="mobileMenu" aria-expanded="false">
+          <span class="burger__line"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile menu -->
+    <aside id="mobileMenu" class="mobileMenu" aria-hidden="true">
+      <nav class="mobileMenu__nav">
+        <a class="mobileMenu__link" href="./index.html">Головна</a>
+        <a class="mobileMenu__link" href="./search.html">Пошук</a>
+        <a class="mobileMenu__link guard-required" href="./favorites.html" data-guard="favorites"
+          >Улюблені</a
+        >
+        <a
+          class="mobileMenu__link guard-required"
+          href="./collections.html"
+          data-guard="collections"
+          >Колекції</a
+        >
+        <a class="mobileMenu__link" href="./profile.html" id="mobileProfileLink" hidden>Кабінет</a>
+        <a class="mobileMenu__link mobileMenu__link--admin" href="./admin-users.html" hidden
+          >Панель адміністратора</a
+        >
+        <a class="mobileMenu__link" href="./auth.html?next=./profile.html" id="mobileLoginLink"
+          >Увійти</a
+        >
+        <button class="mobileMenu__link" id="mobileLogoutBtn" type="button" hidden>Вийти</button>
+      </nav>
+    </aside>
+    <div class="mobileMenu__backdrop" hidden></div>
+
+    <!-- BG handwriting -->
+    <svg
+      class="bg-script"
+      viewBox="0 0 1600 900"
+      preserveAspectRatio="xMidYMid slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <filter id="soft-glow">
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <text x="50%" y="55%" text-anchor="middle" class="bg-script__text">Manga4U</text>
+    </svg>
+
+    <!-- Main -->
+    <main class="main">
+      <section class="section">
+        <div class="section__header">
+          <h2 class="section__title">Редагування профілю</h2>
+        </div>
+
+        <div class="profileCard">
+          <!-- left: avatar -->
+          <div class="profileCard__aside">
+            <div class="avatar">
+              <img
+                id="avatarPreview"
+                src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f464.svg"
+                alt="Аватар користувача"
+              />
+            </div>
+
+            <label class="fileBtn">
+              <input id="avatarInput" type="file" accept="image/*" hidden />
+              Завантажити аватар
+            </label>
+
+            <button id="avatarRemove" class="ghostBtn" type="button">Прибрати</button>
+
+            <p class="hint">PNG або JPG, до 2 МБ. Рекомендовано квадрат 1:1.</p>
+          </div>
+
+          <!-- right: form -->
+          <form id="profileForm" class="profileForm" novalidate autocomplete="off">
+            <div class="grid2">
+              <div class="f">
+                <label class="fl" for="nick">Нікнейм</label>
+                <input
+                  class="fi"
+                  type="text"
+                  id="nick"
+                  name="nick"
+                  placeholder="mangaka"
+                  required
+                  minlength="3"
+                  maxlength="24"
+                />
+                <div class="fe"></div>
+              </div>
+            </div>
+
+            <div class="grid2">
+              <div class="f">
+                <label class="fl" for="email">Логін</label>
+                <input
+                  class="fi"
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="yourLogin"
+                  required
+                  disabled
+                />
+                <div class="fe"></div>
+              </div>
+              <div class="f">
+                <label class="fl" for="lang">Мова інтерфейсу</label>
+                <select class="fi" id="lang" name="lang">
+                  <option value="uk">Українська</option>
+                  <option value="ru">Русская</option>
+                  <option value="en">English</option>
+                </select>
+                <div class="fe"></div>
+              </div>
+            </div>
+
+            <div class="f">
+              <label class="fl" for="bio">Про себе</label>
+              <textarea
+                class="fi"
+                id="bio"
+                name="bio"
+                rows="4"
+                placeholder="Кілька слів про себе…"
+              ></textarea>
+              <div class="fe"></div>
+            </div>
+
+            <div class="subttl">Зміна паролю</div>
+
+            <div class="grid3">
+              <div class="f">
+                <label class="fl" for="passOld">Поточний пароль</label>
+                <div class="pw">
+                  <input class="fi" type="password" id="passOld" autocomplete="current-password" />
+                  <button
+                    class="pw__t form__togglePass"
+                    type="button"
+                    aria-label="Показати/приховати"
+                  ></button>
+                </div>
+                <div class="fe"></div>
+              </div>
+              <div class="f">
+                <label class="fl" for="passNew">Новий пароль</label>
+                <div class="pw">
+                  <input
+                    class="fi"
+                    type="password"
+                    id="passNew"
+                    autocomplete="new-password"
+                    minlength="8"
+                  />
+                  <button
+                    class="pw__t form__togglePass"
+                    type="button"
+                    aria-label="Показати/приховати"
+                  ></button>
+                </div>
+                <div id="passStrength" class="hint"></div>
+                <div class="fe"></div>
+              </div>
+              <div class="f">
+                <label class="fl" for="passNew2">Підтвердження</label>
+                <div class="pw">
+                  <input
+                    class="fi"
+                    type="password"
+                    id="passNew2"
+                    autocomplete="new-password"
+                    minlength="8"
+                  />
+                  <button
+                    class="pw__t form__togglePass"
+                    type="button"
+                    aria-label="Показати/приховати"
+                  ></button>
+                </div>
+                <div class="fe"></div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn btn--primary" type="submit">Зберегти зміни</button>
+              <button class="btn ghostBtn" type="button" id="cancelBtn">Скасувати</button>
+            </div>
+
+            <div id="formMessages" class="messages"></div>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">© 2025 Manga4U</footer>
+
+    <!-- скрипт общего UI -->
+    <!-- скрипт странички профиля -->
+  </body>
+</html>
