@@ -22,5 +22,6 @@ export default defineConfig({
     rollupOptions: {
       input,
     },
+    target: "es2022"
   },
 });
