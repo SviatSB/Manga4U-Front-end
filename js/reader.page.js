@@ -108,9 +108,12 @@ async function loadPages() {
 
     content.innerHTML = "";
 
+    const apiBase = import.meta.env.VITE_API_BASE || '';
+
     for (const f of files) {
       const img = document.createElement("img");
-      img.src = `${base}/data/${hash}/${f}`;
+      const imageUrl = `${base}/data/${hash}/${f}`;
+      img.src = `${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(imageUrl)}`;
       img.alt = f;
       content.appendChild(img);
     }
