@@ -55,8 +55,10 @@ async function renderSmallList(items, grid) {
           const cov = r?.data || r;
           const file = cov?.attributes?.fileName;
           if (file) {
-            cover.style.backgroundImage =
-              `url("https://uploads.mangadex.org/covers/${id}/${file}")`;
+const real = `https://uploads.mangadex.org/covers/${id}/${file}`;
+const apiBase = import.meta.env.VITE_API_BASE || '';
+cover.style.backgroundImage =
+  `url("${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}")`;
           }
         })
         .catch(() => {});

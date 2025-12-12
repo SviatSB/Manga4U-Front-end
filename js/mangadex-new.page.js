@@ -83,7 +83,9 @@ async function renderList(items) {
           const data = res?.data || res;
           const fileName = data?.attributes?.fileName;
           if (fileName) {
-            img.src = `https://uploads.mangadex.org/covers/${id}/${fileName}`;
+            const real = `https://uploads.mangadex.org/covers/${id}/${fileName}`;
+            const apiBase = import.meta.env.VITE_API_BASE || '';
+            img.src = `${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}`;
           }
         }).catch(()=>{});
       coverPromises.push(p);

@@ -304,8 +304,11 @@ async function loadHistory() {
           .then((r) => {
             const d = r?.data || r;
             const file = d?.attributes?.fileName;
-            if (file)
-              img.style.backgroundImage = `url("https://uploads.mangadex.org/covers/${mangaId}/${file}")`;
+            if (file) {
+              const real = `https://uploads.mangadex.org/covers/${mangaId}/${file}`;
+              const apiBase = import.meta.env.VITE_API_BASE || '';
+              img.style.backgroundImage = `url("${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}")` ;
+            }
           })
           .catch(() => {});
       }
@@ -377,8 +380,11 @@ async function loadFrontRecommendations() {
         try {
           const c = await MangadexService.callProxy(`/cover/${rel.id}`);
           const file = c?.data?.attributes?.fileName;
-          if (file)
-            cover = `https://uploads.mangadex.org/covers/${id}/${file}`;
+          if (file) {
+            const real = `https://uploads.mangadex.org/covers/${id}/${file}`;
+            const apiBase = import.meta.env.VITE_API_BASE || '';
+            cover = `${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}`;
+          }
         } catch {}
       }
 

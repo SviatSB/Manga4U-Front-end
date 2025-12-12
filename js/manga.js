@@ -76,8 +76,11 @@ async function load() {
         const coverInfo = await MangadexService.callProxy(`/cover/${relCover.id}`);
         const cdata = coverInfo?.data || coverInfo;
         const file = cdata?.attributes?.fileName;
-        if (file)
-          coverUrl = `https://uploads.mangadex.org/covers/${id}/${file}`;
+        if (file) {
+          const real = `https://uploads.mangadex.org/covers/${id}/${file}`;
+          const apiBase = import.meta.env.VITE_API_BASE || '';
+          coverUrl = `${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}`;
+        }
       } catch {}
     }
 

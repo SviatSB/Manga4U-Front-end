@@ -19,14 +19,17 @@ let isOwner = false;
 ============================================================ */
 async function getCoverUrl(mangaId) {
     try {
-        const res = await fetch(`https://api.mangadex.org/cover?manga[]=${mangaId}&limit=1`);
-        const json = await res.json();
-
-        const cover = json?.data?.[0];
+        const res = await MangadexService.callProxy(`/cover?manga[]=${encodeURIComponent(mangaId)}&limit=1`);
+        const data = res?.data || [];
+        const cover = Array.isArray(data) ? data[0] : null;
         if (!cover) return "/css/placeholder.png";
 
-        const fileName = cover.attributes.fileName;
-        return `https://uploads.mangadex.org/covers/${mangaId}/${fileName}`;
+        const fileName = cover.attributes?.fileName;
+        if (!fileName) return "/css/placeholder.png";
+        
+        const real = `https://uploads.mangadex.org/covers/${mangaId}/${fileName}`;
+        const apiBase = import.meta.env.VITE_API_BASE || '';
+        return `${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}`;
     } catch {
         return "/css/placeholder.png";
     }
