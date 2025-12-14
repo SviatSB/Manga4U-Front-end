@@ -109,12 +109,49 @@
         <button id="reload" class="btn">Перезавантажити сторінки</button>
 
         <a id="openBase" class="btn" href="#" target="_blank">Відкрити baseUrl</a>
+
+        <!-- ✅ ДОБАВИЛ: кнопка-якорь к комментариям -->
+        <a class="btn" href="#chapter-comments">Коментарі</a>
       </div>
     </div>
 
     <a id="openMangaPage" class="reader-back-btn">Перейти до манґи</a>
 
     <div id="content" class="pages"></div>
+
+    <!-- ✅ ДОБАВИЛ: секция комментариев к главе (в самом низу) -->
+    <section id="chapter-comments" class="panel ch-comments" aria-label="Коментарі до глави" style="margin-top:16px;">
+      <div class="ch-comments__head" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <h3 class="ch-comments__title" style="margin:0;">Коментарі до глави</h3>
+        <button id="reloadChapterCommentsBtn" class="btn" type="button">Оновити</button>
+      </div>
+
+      <div class="ch-comments__form" style="margin-top:12px;">
+        <textarea
+          id="chapterCommentText"
+          class="ch-comments__textarea"
+          rows="4"
+          maxlength="1000"
+          placeholder="Напиши коментар до цієї глави…"
+          style="width:100%;"
+        ></textarea>
+
+        <div class="ch-comments__actions" style="display:flex; align-items:center; gap:12px; margin-top:10px;">
+          <button id="sendChapterCommentBtn" class="btn btn-accent" type="button">Опублікувати</button>
+          <div id="chapterCommentMessage" class="ch-comments__message" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- список со скроллом (чтобы не растягивать страницу) -->
+      <div
+        id="chapterCommentsList"
+        class="ch-comments__list"
+        role="list"
+        style="margin-top:14px; max-height:320px; overflow:auto;"
+      >
+        <div class="ch-comments__empty">Поки що немає коментарів.</div>
+      </div>
+    </section>
   </main>
 
   <script type="module" src="./js/reader.page.js"></script>
