@@ -405,43 +405,45 @@ async function loadFrontRecommendations() {
   }
 }
 
+/* ========= Users count (homepage) ========= */
+async function loadUsersCount() {
+  const chip = document.getElementById("usersStat");
+  const out = document.getElementById("usersCount");
+  if (!chip || !out) return;
+
+  chip.hidden = false;
+  chip.classList.add("is-loading");
+  out.textContent = "…";
+
+  try {
+    const data = await apiFetch("/api/Account/count", { method: "GET" });
+    const total = Number(data?.total ?? data?.Total ?? NaN);
+
+    if (!Number.isFinite(total)) throw new Error("Invalid count payload");
+
+    out.textContent = total.toLocaleString("uk-UA");
+  } catch (e) {
+    // если вдруг API недоступен — просто прячем чип, чтобы не мозолил глаза
+    chip.hidden = true;
+  } finally {
+    chip.classList.remove("is-loading");
+  }
+}
+
+
 /* ========= INIT ========= */
 (async function bootstrap() {
   initBurger();
-  initProfileMenu();
 
   const user = await getCurrentUser();
   const isGuest = !user;
 
-  const loginLink = $("#loginLink");
-  const profileBlock = $("#profileBlock");
-  const mobileLoginLink = $("#mobileLoginLink");
-  const mobileLogoutBtn = $("#mobileLogoutBtn");
-  const mobileProfileLink = $("#mobileProfileLink");
-
-  if (isGuest) {
-    loginLink && (loginLink.hidden = false);
-    mobileLoginLink && (mobileLoginLink.hidden = false);
-
-    profileBlock && (profileBlock.hidden = true);
-    mobileProfileLink && (mobileProfileLink.hidden = true);
-    mobileLogoutBtn && (mobileLogoutBtn.hidden = true);
-  } else {
-    loginLink?.remove();
-    mobileLoginLink?.remove();
-
-    profileBlock && (profileBlock.hidden = false);
-    mobileProfileLink && (mobileProfileLink.hidden = false);
-    mobileLogoutBtn && (mobileLogoutBtn.hidden = false);
-
-    $("#profileName").textContent =
-      user.nickname || user.userName || user.email || "Кабінет";
-  }
-
   setupGuards(isGuest);
 
   if (!isGuest) {
+    loadUsersCount();
     loadHomeHistory();
     loadFrontRecommendations();
   }
 })();
+

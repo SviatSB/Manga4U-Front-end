@@ -522,3 +522,175 @@ h3 {
     padding-inline: 12px;
   }
 }
+
+/* ===== Відгуки / Коментарі ===== */
+
+.feedback {
+  margin-top: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.feedback__card {
+  background: #09081666;
+  border: var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.feedback__head {
+  margin-bottom: 10px;
+}
+
+.feedback__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+.feedback__sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.feedback__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.feedback__label {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.feedback__textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 92px;
+  border-radius: 14px;
+  border: var(--border);
+  background: rgba(20, 20, 30, 0.65);
+  color: var(--text);
+  padding: 12px;
+  outline: none;
+}
+
+.feedback__textarea:focus {
+  border-color: rgba(180, 130, 255, 0.5);
+  box-shadow: 0 0 0 2px rgba(150, 110, 230, 0.15);
+}
+
+.feedback__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.feedback__message {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Рейтинг зірками */
+.rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  gap: 6px;
+  user-select: none;
+}
+
+.rating__inp {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rating__lbl {
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.22);
+  transition: 0.15s ease;
+}
+
+.rating__lbl:hover,
+.rating__lbl:hover ~ .rating__lbl {
+  color: rgba(220, 200, 255, 0.9);
+}
+
+.rating__inp:checked ~ .rating__lbl {
+  color: rgba(220, 200, 255, 0.9);
+}
+
+/* Список коментарів зі скролом (щоб сторінка не розтягувалась) */
+.feedback__listHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.feedback__list {
+  max-height: 420px;
+  overflow: auto;
+  padding-right: 6px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedback__empty {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* (на майбутнє) стилі під один коментар */
+.feedback__item {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(10, 10, 18, 0.35);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.feedback__itemHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.feedback__name {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.feedback__date {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.feedback__text {
+  font-size: 13px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+/* Адаптив */
+@media (max-width: 640px) {
+  .feedback__list {
+    max-height: 360px;
+  }
+}
+

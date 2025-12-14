@@ -20,6 +20,28 @@
     let isAdmin = false;
     let allUsers = [];
 
+    // ✅ FIX: hasRole должен быть в этой области видимости (а не во вложенном DOMContentLoaded)
+    function hasRole(user, role) {
+      const want = String(role || '').toLowerCase();
+
+      const roles =
+        user?.roles ||
+        user?.Roles ||
+        user?.role ||
+        user?.Role ||
+        [];
+
+      if (Array.isArray(roles)) {
+        return roles.map(r => String(r).toLowerCase()).includes(want);
+      }
+
+      if (typeof roles === 'string') {
+        return roles.split(',').map(s => s.trim().toLowerCase()).includes(want);
+      }
+
+      return false;
+    }
+
     init().catch((err) => {
       console.error(err);
       showMsg(err.message || 'Помилка ініціалізації', 'err');
@@ -37,8 +59,8 @@
         return;
       }
 
-      isOwner = Auth.hasRole(me, 'owner');
-      isAdmin = isOwner || Auth.hasRole(me, 'admin');
+      isOwner = hasRole(me, 'owner');
+      isAdmin = isOwner || hasRole(me, 'admin');
 
       if (!isAdmin) {
         usersCard.hidden = true;

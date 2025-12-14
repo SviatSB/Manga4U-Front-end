@@ -631,3 +631,42 @@ body.menu-open {
 .mobileMenu__backdrop.is-open {
   opacity: 1;
 }
+
+/* ===== Users counter chip (homepage) ===== */
+.platformStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 999px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.platformStat__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(139, 109, 216, 0.18);
+}
+
+.platformStat__label {
+  opacity: 0.9;
+}
+
+.platformStat__count {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.platformStat.is-loading .platformStat__count {
+  opacity: 0.6;
+}
+

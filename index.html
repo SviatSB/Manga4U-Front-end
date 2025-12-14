@@ -202,6 +202,12 @@
       <section class="section">
         <div class="section__header">
           <h2 class="section__title">Зараз читають</h2>
+
+          <div id="usersStat" class="platformStat" hidden>
+            <span class="platformStat__dot" aria-hidden="true"></span>
+            <span class="platformStat__label">Користувачів:</span>
+            <span id="usersCount" class="platformStat__count">—</span>
+          </div>
         </div>
 
         <div class="board">
@@ -247,5 +253,7 @@
 
   <script type="module" src="/js/home-latest.js"></script>
   <script type="module" src="/js/main.js"></script>
+  <script type="module" src="/js/header.init.js"></script>
+
   </body>
 </html>

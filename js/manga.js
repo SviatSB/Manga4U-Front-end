@@ -8,6 +8,62 @@ function qs(name) {
 
 const id = qs('id');
 const content = document.getElementById('content');
+const API_BASE = import.meta.env.VITE_API_BASE || '';
+
+const TokenStore = {
+  key: 'm4u_token',
+  skey: 'm4u_token_session',
+
+  get() {
+    return (
+      localStorage.getItem(this.key) ||
+      sessionStorage.getItem(this.skey) ||
+      null
+    );
+  },
+
+  clear() {
+    localStorage.removeItem(this.key);
+    sessionStorage.removeItem(this.skey);
+  },
+};
+
+async function apiFetch(path, options = {}) {
+  const token = TokenStore.get();
+  const headers = new Headers(options.headers || {});
+
+  if (options.body && !(options.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+  });
+
+  let text = await response.text();
+  let data;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+
+  if (!response.ok) {
+    if (response.status === 401) TokenStore.clear();
+    const err = new Error(data?.message || response.statusText);
+    err.status = response.status;
+    throw err;
+  }
+
+  return data;
+}
+
+
 
 /* =========================================================
    👍 Сохранение перед переходом к чтению главы
@@ -78,8 +134,7 @@ async function load() {
         const file = cdata?.attributes?.fileName;
         if (file) {
           const real = `https://uploads.mangadex.org/covers/${id}/${file}`;
-          const apiBase = import.meta.env.VITE_API_BASE || '';
-          coverUrl = `${apiBase}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}`;
+          coverUrl = `${API_BASE}/api/MangaDexProxy/image?url=${encodeURIComponent(real)}`;
         }
       } catch {}
     }
@@ -293,9 +348,76 @@ async function load() {
           <h3>Доступні переклади</h3>
           <div id="langArea" class="lang-area">Завантаження...</div>
           <div id="chaptersArea" class="chapters-area"></div>
+
+          <!-- ====== ВІДГУКИ / КОМЕНТАРІ ====== -->
+          <h3 id="reviews">Відгуки та коментарі</h3>
+
+          <section class="feedback" aria-label="Відгуки та коментарі">
+
+            <!-- Верхня секція: залишити -->
+            <div class="feedback__card">
+              <div class="feedback__head">
+                <h4 class="feedback__title">Залишити коментар</h4>
+                <div class="feedback__sub">Поділись думкою та оціни манґу.</div>
+              </div>
+
+              <div class="feedback__form">
+                <div class="feedback__row">
+                  <span class="feedback__label">Оцінка:</span>
+
+                  <div class="rating" role="radiogroup" aria-label="Оцінка від 1 до 5">
+                    <input class="rating__inp" type="radio" name="stars" id="star5" value="5" />
+                    <label class="rating__lbl" for="star5" title="5">★</label>
+
+                    <input class="rating__inp" type="radio" name="stars" id="star4" value="4" />
+                    <label class="rating__lbl" for="star4" title="4">★</label>
+
+                    <input class="rating__inp" type="radio" name="stars" id="star3" value="3" />
+                    <label class="rating__lbl" for="star3" title="3">★</label>
+
+                    <input class="rating__inp" type="radio" name="stars" id="star2" value="2" />
+                    <label class="rating__lbl" for="star2" title="2">★</label>
+
+                    <input class="rating__inp" type="radio" name="stars" id="star1" value="1" />
+                    <label class="rating__lbl" for="star1" title="1">★</label>
+                  </div>
+                </div>
+
+                <textarea
+                  id="commentText"
+                  class="feedback__textarea"
+                  rows="4"
+                  maxlength="1000"
+                  placeholder="Напиши свій коментар…"
+                ></textarea>
+
+                <div class="feedback__actions">
+                  <button id="sendCommentBtn" class="btn btn-accent" type="button">
+                    Опублікувати
+                  </button>
+                  <div id="commentMessage" class="feedback__message" aria-live="polite"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Нижня секція: список зі скролом -->
+            <div class="feedback__card">
+              <div class="feedback__listHead">
+                <h4 class="feedback__title">Всі коментарі</h4>
+                <button id="reloadCommentsBtn" class="btn btn-small" type="button">Оновити</button>
+              </div>
+
+              <div id="commentsList" class="feedback__list" role="list">
+                <div class="feedback__empty">Поки що немає коментарів.</div>
+              </div>
+            </div>
+
+          </section>
         </div>
       </div>
     `;
+
+    initFeedback();
 
     (async () => {
       const { langs } = await buildLanguageOptions();
@@ -361,5 +483,279 @@ function escapeHtml(s) {
     })[c]
   );
 }
+
+let __feedbackUser = null;
+let __feedbackIsAdmin = false;
+
+function hasRole(user, role) {
+  const want = String(role || "").toLowerCase();
+  const roles = user?.roles || user?.Roles || user?.role || user?.Role || [];
+  if (Array.isArray(roles)) return roles.map(r => String(r).toLowerCase()).includes(want);
+  if (typeof roles === "string") return roles.split(",").map(s => s.trim().toLowerCase()).includes(want);
+  return false;
+}
+
+function getUserModerationState(user) {
+  const isMuted = !!(user?.isMuted ?? user?.IsMuted);
+  const isBanned = !!(user?.isBanned ?? user?.IsBanned);
+  return { isMuted, isBanned };
+}
+
+function lockFeedbackForRestricted(kind) {
+  const btn = document.getElementById("sendCommentBtn");
+  const ta = document.getElementById("commentText");
+  const msg = document.getElementById("commentMessage");
+  const radios = document.querySelectorAll('input[name="stars"]');
+
+  if (btn) btn.disabled = true;
+  if (ta) ta.disabled = true;
+  radios.forEach(r => (r.disabled = true));
+
+  if (!msg) return;
+  msg.textContent =
+    kind === "banned"
+      ? "Ви забанені. Додавати відгуки та коментарі заборонено."
+      : "Ви в м'юті. Поки м'ют активний — ви не можете писати коментарі.";
+}
+
+
+/* =========================================================
+   ✅ ВІДГУКИ / КОМЕНТАРІ + ЗАХИСТ ГОСТЯ + ВИДАЛЕННЯ (Admin)
+   ========================================================= */
+
+function parseJwt(token) {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64 + "===".slice((base64.length + 3) % 4);
+    const json = decodeURIComponent(
+      atob(padded)
+        .split("")
+        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function isAdminFromAny(user) {
+  const roles =
+    user?.roles ||
+    user?.Roles ||
+    user?.role ||
+    user?.Role ||
+    user?.userRoles ||
+    user?.UserRoles;
+
+  if (Array.isArray(roles) && roles.includes("Admin")) return true;
+  if (typeof roles === "string" && roles.split(",").map(s => s.trim()).includes("Admin")) return true;
+
+  const token = TokenStore.get();
+  if (!token) return false;
+
+  const payload = parseJwt(token);
+  if (!payload) return false;
+
+  const roleClaim =
+    payload.role ||
+    payload.roles ||
+    payload.Role ||
+    payload.Roles ||
+    payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+    payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"];
+
+  if (Array.isArray(roleClaim)) return roleClaim.includes("Admin");
+  if (typeof roleClaim === "string") return roleClaim === "Admin" || roleClaim.split(",").map(s => s.trim()).includes("Admin");
+
+  return false;
+}
+
+function lockFeedbackForGuest() {
+  const btn = document.getElementById("sendCommentBtn");
+  const ta = document.getElementById("commentText");
+  const msg = document.getElementById("commentMessage");
+  const radios = document.querySelectorAll('input[name="stars"]');
+
+  if (btn) btn.disabled = true;
+  if (ta) ta.disabled = true;
+  radios.forEach(r => (r.disabled = true));
+
+  const next = encodeURIComponent(location.pathname + location.search);
+  if (msg) {
+    msg.innerHTML = `Щоб залишити відгук, потрібно увійти/зареєструватись.
+      <a href="./auth.html?next=${next}">Перейти до реєстрації</a>`;
+  }
+}
+
+function unlockFeedback() {
+  const btn = document.getElementById("sendCommentBtn");
+  const ta = document.getElementById("commentText");
+  const msg = document.getElementById("commentMessage");
+  const radios = document.querySelectorAll('input[name="stars"]');
+
+  if (btn) btn.disabled = false;
+  if (ta) ta.disabled = false;
+  radios.forEach(r => (r.disabled = false));
+  if (msg) msg.textContent = "";
+}
+
+function renderReviews(items) {
+  const list = document.getElementById("commentsList");
+  if (!list) return;
+
+  if (!items?.length) {
+    list.innerHTML = `<div class="feedback__empty">Поки що немає відгуків.</div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(r => {
+    const stars = (r.stars ?? r.Stars ?? 0);
+    const rid = (r.id ?? r.Id ?? r.reviewId ?? r.ReviewId ?? "");
+    const delBtn = (__feedbackIsAdmin && rid)
+      ? `<button class="btn btn-small" type="button" data-review-delete="${rid}">Видалити</button>`
+      : "";
+
+    return `
+      <div class="feedback__item">
+        <div class="feedback__itemHead">
+          <div class="feedback__name">${escapeHtml(r.userNickname || r.UserNickname || "User")}</div>
+          <div class="feedback__stars">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</div>
+          ${delBtn}
+        </div>
+        <div class="feedback__text">${escapeHtml(r.text || r.Text || "")}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function loadReviews() {
+  const list = document.getElementById("commentsList");
+  if (list) list.innerHTML = `<div class="feedback__empty">Завантаження…</div>`;
+
+  try {
+    const data = await apiFetch(`/api/review/manga/${id}?skip=0&take=50`);
+    renderReviews(data?.items || data?.Items || []);
+  } catch (e) {
+    console.warn("loadReviews failed:", e);
+    if (list) list.innerHTML = `<div class="feedback__empty">Не вдалося завантажити.</div>`;
+  }
+}
+
+async function deleteReviewAsAdmin(reviewId) {
+  if (!__feedbackIsAdmin) return;
+
+  const ok = confirm("Видалити цей коментар?");
+  if (!ok) return;
+
+  try {
+    await apiFetch(`/api/review/${reviewId}`, { method: "DELETE" });
+    await loadReviews();
+  } catch (e) {
+    console.warn("deleteReview failed:", e);
+    alert("Не вдалося видалити.");
+  }
+}
+
+async function submitReview() {
+  const msg = document.getElementById("commentMessage");
+  const textEl = document.getElementById("commentText");
+  const text = (textEl?.value || "").trim();
+  const stars = Number(document.querySelector('input[name="stars"]:checked')?.value || 0);
+
+  if (!stars) {
+    if (msg) msg.textContent = "Оберіть оцінку 1–5.";
+    return;
+  }
+
+  // нет токена => гость
+  if (!TokenStore.get()) {
+    lockFeedbackForGuest();
+    return;
+  }
+
+  // если пользователь в мюте/бане — не отправляем
+if (__feedbackUser) {
+  const { isMuted, isBanned } = getUserModerationState(__feedbackUser);
+  if (isBanned) { lockFeedbackForRestricted("banned"); return; }
+  if (isMuted) { lockFeedbackForRestricted("muted"); return; }
+}
+
+
+  try {
+    // ВАЖНО: только apiFetch, чтобы отправлялся Authorization: Bearer ...
+    await apiFetch("/api/review", {
+      method: "POST",
+      body: JSON.stringify({ mangaExternalId: id, stars, text })
+    });
+
+    if (msg) msg.textContent = "Готово ✅";
+    if (textEl) textEl.value = "";
+    const checked = document.querySelector('input[name="stars"]:checked');
+    if (checked) checked.checked = false;
+
+    await loadReviews();
+  } catch (e) {
+    if (e?.status === 401) {
+      lockFeedbackForGuest();
+      return;
+    }
+    console.warn("submitReview failed:", e);
+    if (msg) msg.textContent = "Помилка при відправці.";
+  }
+}
+
+async function getCurrentUserSafe() {
+  if (!TokenStore.get()) return null;
+  try {
+    // как у тебя в main.js
+    return await apiFetch("/api/Account/me");
+  } catch (e) {
+    return null;
+  }
+}
+
+async function initFeedback() {
+  const sendBtn = document.getElementById("sendCommentBtn");
+  const reloadBtn = document.getElementById("reloadCommentsBtn");
+  const list = document.getElementById("commentsList");
+
+  if (reloadBtn) reloadBtn.addEventListener("click", loadReviews);
+
+  const user = await getCurrentUserSafe();
+  __feedbackUser = user;
+  __feedbackIsAdmin = !!user && hasRole(user, "admin");
+
+  if (!user) {
+    lockFeedbackForGuest();
+  } else {
+    const { isMuted, isBanned } = getUserModerationState(user);
+
+    if (isBanned) {
+      lockFeedbackForRestricted("banned");
+    } else if (isMuted) {
+      lockFeedbackForRestricted("muted");
+    } else {
+      unlockFeedback();
+      sendBtn?.addEventListener("click", submitReview);
+    }
+  }
+
+  // Делегирование клика по кнопке удаления (если у тебя уже было) — оставляем как есть:
+  if (list && !list.dataset.deleteBound) {
+    list.dataset.deleteBound = "1";
+    list.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-review-delete]");
+      if (!btn) return;
+      const rid = btn.getAttribute("data-review-delete");
+      if (!rid) return;
+      deleteReviewAsAdmin(rid);
+    });
+  }
+
+  await loadReviews();
+}
+
 
 load();
