@@ -349,15 +349,15 @@ async function load() {
           <div id="langArea" class="lang-area">Завантаження...</div>
           <div id="chaptersArea" class="chapters-area"></div>
 
-          <!-- ====== ВІДГУКИ / КОМЕНТАРІ ====== -->
-          <h3 id="reviews">Відгуки та коментарі</h3>
+          <!-- ====== ВІДГУКИ ====== -->
+          <h3 id="reviews">Відгуки</h3>
 
-          <section class="feedback" aria-label="Відгуки та коментарі">
+          <section class="feedback" aria-label="Відгуки">
 
             <!-- Верхня секція: залишити -->
             <div class="feedback__card">
               <div class="feedback__head">
-                <h4 class="feedback__title">Залишити коментар</h4>
+                <h4 class="feedback__title">Залишити відгук</h4>
                 <div class="feedback__sub">Поділись думкою та оціни манґу.</div>
               </div>
 
@@ -388,7 +388,7 @@ async function load() {
                   class="feedback__textarea"
                   rows="4"
                   maxlength="1000"
-                  placeholder="Напиши свій коментар…"
+                  placeholder="Напиши свій відгук…"
                 ></textarea>
 
                 <div class="feedback__actions">
@@ -403,12 +403,12 @@ async function load() {
             <!-- Нижня секція: список зі скролом -->
             <div class="feedback__card">
               <div class="feedback__listHead">
-                <h4 class="feedback__title">Всі коментарі</h4>
+                <h4 class="feedback__title">Всі відгуки</h4>
                 <button id="reloadCommentsBtn" class="btn btn-small" type="button">Оновити</button>
               </div>
 
               <div id="commentsList" class="feedback__list" role="list">
-                <div class="feedback__empty">Поки що немає коментарів.</div>
+                <div class="feedback__empty">Поки що немає відгуків.</div>
               </div>
             </div>
 
@@ -514,13 +514,13 @@ function lockFeedbackForRestricted(kind) {
   if (!msg) return;
   msg.textContent =
     kind === "banned"
-      ? "Ви забанені. Додавати відгуки та коментарі заборонено."
-      : "Ви в м'юті. Поки м'ют активний — ви не можете писати коментарі.";
+      ? "Ви забанені. Додавати відгуки заборонено."
+      : "Ви в м'юті. Поки м'ют активний — ви не можете писати відгуки.";
 }
 
 
 /* =========================================================
-   ✅ ВІДГУКИ / КОМЕНТАРІ + ЗАХИСТ ГОСТЯ + ВИДАЛЕННЯ (Admin)
+   ✅ ВІДГУКИ + ЗАХИСТ ГОСТЯ + ВИДАЛЕННЯ (Admin)
    ========================================================= */
 
 function parseJwt(token) {
@@ -646,7 +646,7 @@ async function loadReviews() {
 async function deleteReviewAsAdmin(reviewId) {
   if (!__feedbackIsAdmin) return;
 
-  const ok = confirm("Видалити цей коментар?");
+  const ok = confirm("Видалити цей відгук?");
   if (!ok) return;
 
   try {
