@@ -216,7 +216,47 @@
     <main class="main">
       <section class="section">
         <div class="section__header">
-          <h2 class="section__title">Адмін-панель — Користувачі</h2>
+          <h2 class="section__title">Статистика</h2>
+        </div>
+
+        <div class="statsControls">
+          <select id="statsPeriod">
+            <option value="all">За весь час</option>
+            <option value="day">За день</option>
+            <option value="week">За тиждень</option>
+            <option value="month">За місяць</option>
+            <option value="year">За рік</option>
+          </select>
+          <button id="statsRefresh" class="btn btn--primary" type="button">Оновити</button>
+        </div>
+
+        <div id="statsGrid" class="statsGrid">
+          <div class="statCard">
+            <div class="statCard__label">Активні користувачі</div>
+            <div id="stat-active" class="statCard__value">—</div>
+          </div>
+          <div class="statCard">
+            <div class="statCard__label">Реєстрації</div>
+            <div id="stat-registrations" class="statCard__value">—</div>
+          </div>
+          <div class="statCard">
+            <div class="statCard__label">Відгуки</div>
+            <div id="stat-reviews" class="statCard__value">—</div>
+          </div>
+          <div class="statCard">
+            <div class="statCard__label">Коментарі</div>
+            <div id="stat-comments" class="statCard__value">—</div>
+          </div>
+          <div class="statCard">
+            <div class="statCard__label">Колекції</div>
+            <div id="stat-collections" class="statCard__value">—</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section__header">
+          <h2 class="section__title">Користувачі</h2>
         </div>
 
         <div class="adminToolbar">
@@ -300,6 +340,7 @@
   <script type="module" src="/js/admin.confirm.js"></script>
   <script type="module" src="/js/admin.app.server.js"></script>
   <script type="module" src="/js/admin.app.js"></script>
+  <script type="module" src="/js/admin.stats.js"></script>
 
     <!-- UI логіка, відображення, кнопки -->
   </body>

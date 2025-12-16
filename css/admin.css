@@ -38,6 +38,49 @@
   margin-right: 8px;
 }
 
+/* Statistics */
+.statsControls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0 16px;
+}
+.statsControls select {
+  appearance: none;
+  background: #141419;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.statCard {
+  background: linear-gradient(180deg, #1a1a22, #121219);
+  border: var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 0 25px rgba(139, 109, 216, 0.22);
+  text-align: center;
+}
+.statCard__label {
+  font-size: 14px;
+  color: #cbc7dd;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+.statCard__value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 0 12px rgba(139, 109, 216, 0.5);
+}
+
 /* Users list */
 .usersCard {
   background: linear-gradient(180deg, #1a1a22, #121219);
