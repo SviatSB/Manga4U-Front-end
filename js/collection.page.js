@@ -1,4 +1,5 @@
 import "/js/api.client.js";
+import MangadexService from "/js/mangadex.service.js";
 
 function qs(name) {
     const m = location.search.match(new RegExp("[?&]" + name + "=([^&]+)"));
@@ -161,10 +162,13 @@ async function renderManga(items) {
     }
 
     for (const m of items) {
-        const coverUrl = await getCoverUrl(m.externalId);
-
         const div = document.createElement("div");
         div.className = "collection-card";
+
+        const img = document.createElement("img");
+        img.className = "collection-cover";
+        img.alt = m.name;
+        img.src = "/css/placeholder.png";
 
         div.innerHTML = `
             <!-- Иконка удаления -->
@@ -172,7 +176,6 @@ async function renderManga(items) {
 
             <!-- Кликабельная область для перехода на мангу -->
             <a class="collection-card__link" href="/manga.html?id=${m.externalId}">
-                <img class="collection-cover" src="${coverUrl}" alt="${m.name}">
                 <div class="collection-title">${m.name}</div>
             </a>
 
@@ -183,8 +186,20 @@ async function renderManga(items) {
             }
         `;
 
-        // ⚠️ НИКАКИХ div.addEventListener("click", ...) БОЛЬШЕ НЕ НУЖНО
+        // Вставляем img в начало ссылки
+        const link = div.querySelector(".collection-card__link");
+        if (link) {
+            link.insertBefore(img, link.firstChild);
+        }
+
         listEl.appendChild(div);
+
+        // Загружаем обложку асинхронно в фоне
+        getCoverUrl(m.externalId).then(url => {
+            img.src = url;
+        }).catch(() => {
+            img.src = "/css/placeholder.png";
+        });
     }
 }
 
