@@ -8,6 +8,7 @@ function qs(name) {
 const id = qs("id");
 
 const titleEl = document.getElementById("colName");
+const infoEl = document.getElementById("collectionInfo");
 const actionsEl = document.getElementById("collectionActions");
 const listEl = document.getElementById("mangaList");
 
@@ -49,6 +50,7 @@ async function load() {
         isSystem = data.systemCollectionType !== null;
         isOwner = data.isOwner ?? false;
 
+        renderOwnerInfo(data);
         renderActions(data);
 
         // Загружаем манги коллекции
@@ -58,6 +60,35 @@ async function load() {
         console.error(err);
         titleEl.textContent = "Колекція не знайдена";
     }
+}
+
+/* ============================================================
+    Отображение информации об авторе коллекции
+============================================================ */
+function renderOwnerInfo(col) {
+    if (!infoEl) return;
+    infoEl.innerHTML = "";
+
+    // Не отображаем автора для системных коллекций
+    if (col.systemCollectionType !== null) {
+        return;
+    }
+
+    const avatarUrl = col.userAvatarUrl || col.UserAvatarUrl || "";
+    const nickname = col.userNickname || col.UserNickname || "Невідомий";
+
+    if (avatarUrl) {
+        const avatar = document.createElement("img");
+        avatar.src = avatarUrl;
+        avatar.alt = nickname;
+        avatar.style.cssText = "width: 40px; height: 40px; border-radius: 10px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.06);";
+        infoEl.appendChild(avatar);
+    }
+
+    const nameEl = document.createElement("div");
+    nameEl.textContent = "Автор: " + nickname;
+    nameEl.style.cssText = "font-size: 14px; color: #c9c6d6;";
+    infoEl.appendChild(nameEl);
 }
 
 /* ============================================================
@@ -120,6 +151,14 @@ function renderActions(col) {
 ============================================================ */
 async function renderManga(items) {
     listEl.innerHTML = "";
+
+    if (!items || items.length === 0) {
+        const emptyDiv = document.createElement("div");
+        emptyDiv.style.cssText = "grid-column: 1 / -1; padding: 40px 20px; text-align: center; color: #c9c6d6; font-size: 16px;";
+        emptyDiv.textContent = "Колекція порожня.";
+        listEl.appendChild(emptyDiv);
+        return;
+    }
 
     for (const m of items) {
         const coverUrl = await getCoverUrl(m.externalId);

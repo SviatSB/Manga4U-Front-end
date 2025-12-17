@@ -613,6 +613,7 @@ function renderReviews(items) {
   list.innerHTML = items.map(r => {
     const stars = (r.stars ?? r.Stars ?? 0);
     const rid = (r.id ?? r.Id ?? r.reviewId ?? r.ReviewId ?? "");
+    const avatarUrl = r.userAvatarUrl || r.UserAvatarUrl || "";
     const delBtn = (__feedbackIsAdmin && rid)
       ? `<button class="btn btn-small" type="button" data-review-delete="${rid}">Видалити</button>`
       : "";
@@ -620,7 +621,10 @@ function renderReviews(items) {
     return `
       <div class="feedback__item">
         <div class="feedback__itemHead">
-          <div class="feedback__name">${escapeHtml(r.userNickname || r.UserNickname || "User")}</div>
+          <div class="feedback__user">
+            ${avatarUrl ? `<img src="${avatarUrl}" alt="" class="feedback__avatar" />` : ""}
+            <div class="feedback__name">${escapeHtml(r.userNickname || r.UserNickname || "User")}</div>
+          </div>
           <div class="feedback__stars">${"★".repeat(stars)}${"☆".repeat(5 - stars)}</div>
           ${delBtn}
         </div>

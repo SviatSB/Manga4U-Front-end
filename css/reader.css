@@ -247,6 +247,16 @@ svg{
   min-width: 0;
 }
 
+.ch-comments__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #0f0f14;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
 .ch-comments__name {
   font-weight: 600;
   font-size: 13px;

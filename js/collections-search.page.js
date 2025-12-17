@@ -38,18 +38,9 @@ function renderResults(list) {
         const card = document.createElement("div");
         card.className = "collection-card search-card";
 
-        const owner =
-            col.ownerName ||
-            col.userName ||
-            col.ownerLogin ||
-            "Невідомий автор";
-
         card.innerHTML = `
             <div class="search-card__body">
                 <div class="collection-title">${col.name}</div>
-                <div class="collection-meta">
-                    Автор: ${owner}
-                </div>
             </div>
 
             <div class="search-card__actions">

@@ -308,6 +308,7 @@ function renderChapterComments(items) {
       const id = c.id ?? c.Id;
       const text = c.text ?? c.Text ?? "";
       const nick = c.userNickname ?? c.UserNickname ?? "User";
+      const avatarUrl = c.userAvatarUrl ?? c.UserAvatarUrl ?? "";
       const createdAt = c.createdAt ?? c.CreatedAt ?? "";
       const isPinned = c.isPined ?? c.IsPined ?? c.isPinned ?? c.IsPinned ?? false;
 
@@ -315,6 +316,7 @@ function renderChapterComments(items) {
         <div class="ch-comments__item" role="listitem">
           <div class="ch-comments__itemHead">
             <div class="ch-comments__meta">
+              ${avatarUrl ? `<img src="${avatarUrl}" alt="" class="ch-comments__avatar" />` : ""}
               <div class="ch-comments__name">${escapeHtml(nick)}</div>
               <div class="ch-comments__date">${escapeHtml(formatDate(createdAt))}</div>
               ${isPinned ? `<span class="ch-comments__pin">📌 pinned</span>` : ""}
